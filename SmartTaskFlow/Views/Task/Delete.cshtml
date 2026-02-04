@@ -1,0 +1,723 @@
+﻿@model SmartTaskFlow.Models.TaskItem
+
+@{
+    ViewData["Title"] = "Supprimer la tâche";
+}
+
+<style>
+    .delete-section {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, #f8f9ff 0%, #fefefe 100%);
+    }
+
+    .delete-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(220, 53, 69, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(220, 53, 69, 0.1);
+    }
+
+        .delete-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(220, 53, 69, 0.15);
+        }
+
+    .card-header-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        padding: 2rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .card-header-danger::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            animation: floatBackground 20s linear infinite;
+        }
+
+    .warning-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        animation: pulseWarning 2s ease-in-out infinite;
+    }
+
+    .task-preview {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 2px solid transparent;
+        background: white;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .task-preview:hover {
+            border-color: #dc3545;
+            transform: translateX(5px);
+        }
+
+    .task-header {
+        background: linear-gradient(to right, var(--category-color, #6c757d), color-mix(in srgb, var(--category-color, #6c757d) 80%, black 20%));
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+
+        .task-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(to left, rgba(255,255,255,0.3), transparent);
+            opacity: 0.3;
+        }
+
+    .detail-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+        .detail-item:hover {
+            background: linear-gradient(to right, #fff5f5, transparent);
+            padding-left: 2rem;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .detail-label i {
+            width: 20px;
+            text-align: center;
+        }
+
+    .detail-value {
+        color: #212529;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .overdue-alert {
+        animation: shake 0.5s ease-in-out;
+        position: relative;
+    }
+
+        .overdue-alert::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, #dc3545, #ff6b6b, #dc3545);
+            border-radius: inherit;
+            z-index: -1;
+            animation: borderGlow 2s linear infinite;
+        }
+
+        .overdue-alert > * {
+            position: relative;
+            z-index: 1;
+        }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        padding: 1rem 2.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3);
+    }
+
+        .btn-delete:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-delete:active {
+            transform: translateY(1px);
+        }
+
+        .btn-delete::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-delete:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border: none;
+        padding: 1rem 2.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 24px rgba(108, 117, 125, 0.2);
+    }
+
+        .btn-cancel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(108, 117, 125, 0.3);
+            background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+        .action-buttons > * {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+
+    .confirmation-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .confirmation-dialog.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .confirmation-box {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    .confirmation-dialog.active .confirmation-box {
+        transform: scale(1);
+    }
+
+    .typewriter-text {
+        overflow: hidden;
+        border-right: 2px solid #dc3545;
+        white-space: nowrap;
+        margin: 0 auto;
+        letter-spacing: 0.15em;
+        animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+
+    @@keyframes pulseWarning {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 20px rgba(220, 53, 69, 0);
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+
+    @@keyframes borderGlow {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    @@keyframes typing {
+        from {
+            width: 0
+        }
+
+        to {
+            width: 100%
+        }
+    }
+
+    @@keyframes blink-caret {
+        from, to {
+            border-color: transparent
+        }
+
+        50% {
+            border-color: #dc3545
+        }
+    }
+
+    @@keyframes floatBackground {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .delete-section {
+            padding: 1rem;
+        }
+
+        .action-buttons > * {
+            min-width: 100%;
+        }
+
+        .detail-item {
+            padding: 0.75rem 1rem;
+        }
+
+            .detail-item:hover {
+                padding-left: 1.25rem;
+            }
+
+        .card-header-danger {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+
+<section class="delete-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="delete-card" style="animation: slideIn 0.6s ease-out;">
+                    <!-- Header avec animation -->
+                    <div class="card-header-danger text-center text-white">
+                        <div class="warning-icon">
+                            ⚠️
+                        </div>
+                        <h1 class="display-6 fw-bold mb-3 typewriter-text">Confirmation de suppression</h1>
+                        <p class="lead opacity-90 mb-0">Action irréversible - Veuillez confirmer votre choix</p>
+                    </div>
+
+                    <div class="card-body p-4 p-lg-5">
+                        <!-- Alerte d'avertissement améliorée -->
+                        <div class="alert alert-danger border-0 rounded-3 mb-5" style="background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="bi bi-exclamation-triangle-fill fs-2 text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="alert-heading fw-bold text-danger mb-2">
+                                        <i class="bi bi-shield-exclamation me-2"></i>
+                                        Attention : Action Critique
+                                    </h5>
+                                    <p class="mb-2">Vous êtes sur le point de supprimer définitivement cette tâche. Cette action ne peut pas être annulée.</p>
+                                    <div class="d-flex align-items-center text-danger small">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <span>Tous les détails, historiques et métriques associés seront perdus.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu de la tâche -->
+                        <div class="mb-5">
+                            <h4 class="fw-bold mb-4 text-center">
+                                <i class="bi bi-eye-fill me-2 text-primary"></i>
+                                Aperçu de la tâche à supprimer
+                            </h4>
+
+                            <div class="task-preview">
+                                <div class="task-header" style="--category-color: @(Model.Category?.ColorCode ?? "#6c757d")">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h3 class="fw-bold mb-2">
+                                                <span class="me-2">@(Model.Category?.Icon ?? "📌")</span>
+                                                @Model.Title
+                                            </h3>
+                                            <p class="mb-0 opacity-90">
+                                                <i class="bi bi-calendar3 me-1"></i>
+                                                Créée le @Model.CreatedAt.ToString("dd MMMM yyyy à HH:mm")
+                                            </p>
+                                        </div>
+                                        <div class="status-badge bg-white text-dark">
+                                            @if (Model.Status == "Completed")
+                                            {
+                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                <span>Complétée</span>
+                                            }
+                                            else if (Model.Status == "InProgress")
+                                            {
+                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                                <span>En cours</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-clock text-secondary"></i>
+                                                <span>À faire</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="details-grid">
+                                    <div class="detail-item d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">
+                                            <i class="bi bi-card-text"></i>
+                                            Description
+                                        </span>
+                                        <span class="detail-value text-end">
+                                            @(string.IsNullOrEmpty(Model.Description) ? "Aucune description" : Model.Description)
+                                        </span>
+                                    </div>
+
+                                    <div class="detail-item d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">
+                                            <i class="bi bi-tag"></i>
+                                            Catégorie
+                                        </span>
+                                        <span class="detail-value">
+                                            @if (Model.Category != null)
+                                            {
+                                                <span class="badge rounded-pill px-3 py-2"
+                                                      style="background: linear-gradient(135deg, @Model.Category.ColorCode, color-mix(in srgb, @Model.Category.ColorCode 80%, black 20%));">
+                                                    <i class="bi @Model.Category.Icon me-1"></i>
+                                                    @Model.Category.CategoryName
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Non catégorisée</span>
+                                            }
+                                        </span>
+                                    </div>
+
+                                    <div class="detail-item d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">
+                                            <i class="bi bi-clock"></i>
+                                            Durée estimée
+                                        </span>
+                                        <span class="detail-value">
+                                            <i class="bi bi-hourglass-split me-1"></i>
+                                            @Model.FormattedDuration
+                                        </span>
+                                    </div>
+
+                                    <div class="detail-item d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">
+                                            <i class="bi bi-battery"></i>
+                                            Niveau d'énergie
+                                        </span>
+                                        <span class="detail-value">
+                                            <span class="badge rounded-pill px-3 py-2 bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                                                <i class="bi bi-lightning-charge me-1"></i>
+                                                @Model.EnergyLevelFrench
+                                            </span>
+                                        </span>
+                                    </div>
+
+                                    <div class="detail-item d-flex justify-content-between align-items-center">
+                                        <span class="detail-label">
+                                            <i class="bi bi-flag"></i>
+                                            Priorité
+                                        </span>
+                                        <span class="detail-value">
+                                            @Html.Raw(Model.PriorityBadge)
+                                        </span>
+                                    </div>
+
+                                    @if (Model.Deadline.HasValue)
+                                    {
+                                        <div class="detail-item d-flex justify-content-between align-items-center @(Model.IsOverdue ? "overdue-alert" : "")">
+                                            <span class="detail-label">
+                                                <i class="bi bi-calendar-x"></i>
+                                                Date limite
+                                            </span>
+                                            <span class="detail-value">
+                                                <span class="@(Model.IsOverdue ? "text-danger fw-bold" : "text-dark")">
+                                                    <i class="bi bi-calendar-check me-1"></i>
+                                                    @Model.Deadline.Value.ToString("dd MMM yyyy à HH:mm")
+                                                </span>
+                                                @if (Model.IsOverdue)
+                                                {
+                                                    <span class="badge bg-danger rounded-pill ms-2 px-3 py-1">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        EN RETARD
+                                                    </span>
+                                                }
+                                            </span>
+                                        </div>
+                                    }
+
+                                    @if (Model.CompletedAt.HasValue)
+                                    {
+                                        <div class="detail-item d-flex justify-content-between align-items-center">
+                                            <span class="detail-label">
+                                                <i class="bi bi-check-circle"></i>
+                                                Complétée le
+                                            </span>
+                                            <span class="detail-value text-success">
+                                                <i class="bi bi-calendar-check me-1"></i>
+                                                @Model.CompletedAt.Value.ToString("dd MMM yyyy à HH:mm")
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulaire de confirmation -->
+                        <form asp-action="Delete" method="post" id="deleteForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="TaskId" />
+
+                            <div class="text-center mb-4">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="confirmDelete" style="width: 1.2em; height: 1.2em;">
+                                    <label class="form-check-label fw-semibold" for="confirmDelete">
+                                        Je confirme vouloir supprimer cette tâche définitivement
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons mt-5">
+                                <a asp-action="Index" class="btn btn-cancel text-white">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Annuler et retourner
+                                </a>
+
+                                <button type="button"
+                                        id="submitDelete"
+                                        class="btn btn-delete text-white"
+                                        disabled>
+                                    <i class="bi bi-trash3 me-2"></i>
+                                    Supprimer définitivement
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dialogue de confirmation amélioré -->
+<div class="confirmation-dialog" id="confirmationDialog">
+    <div class="confirmation-box">
+        <div class="text-center mb-4">
+            <div class="warning-icon d-inline-flex mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                ⚠️
+            </div>
+            <h3 class="fw-bold text-danger mb-3">Dernière confirmation</h3>
+            <p class="text-muted">Êtes-vous ABSOLUMENT certain de vouloir supprimer cette tâche ?</p>
+        </div>
+
+        <div class="alert alert-danger border-0 rounded-3 mb-4">
+            <div class="d-flex">
+                <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
+                <div>
+                    <strong>Cette action est irréversible !</strong>
+                    <p class="mb-0 small">La tâche et toutes ses données seront définitivement supprimées.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+            <button type="button" class="btn btn-secondary" id="cancelFinal">
+                <i class="bi bi-x-circle me-2"></i>
+                Annuler
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmFinal">
+                <i class="bi bi-check-circle me-2"></i>
+                Oui, supprimer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmCheckbox = document.getElementById('confirmDelete');
+        const submitButton = document.getElementById('submitDelete');
+        const confirmationDialog = document.getElementById('confirmationDialog');
+        const cancelFinalButton = document.getElementById('cancelFinal');
+        const confirmFinalButton = document.getElementById('confirmFinal');
+        const deleteForm = document.getElementById('deleteForm');
+
+        // Activer/désactiver le bouton de soumission
+        confirmCheckbox.addEventListener('change', function() {
+            submitButton.disabled = !this.checked;
+            if (this.checked) {
+                submitButton.classList.add('btn-danger');
+                submitButton.classList.remove('btn-secondary');
+            } else {
+                submitButton.classList.remove('btn-danger');
+                submitButton.classList.add('btn-secondary');
+            }
+        });
+
+        // Afficher le dialogue de confirmation
+        submitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirmCheckbox.checked) {
+                confirmationDialog.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        // Annuler dans le dialogue
+        cancelFinalButton.addEventListener('click', function() {
+            confirmationDialog.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Confirmer définitivement
+        confirmFinalButton.addEventListener('click', function() {
+            // Animation de suppression
+            submitButton.innerHTML = '<i class="bi bi-trash3 me-2"></i>Suppression en cours...';
+            submitButton.disabled = true;
+
+            // Simuler une courte animation avant soumission
+            setTimeout(() => {
+                deleteForm.submit();
+            }, 800);
+        });
+
+        // Fermer le dialogue en cliquant à l'extérieur
+        confirmationDialog.addEventListener('click', function(e) {
+            if (e.target === confirmationDialog) {
+                confirmationDialog.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Animation pour les éléments en retard
+        const overdueElements = document.querySelectorAll('.overdue-alert');
+        overdueElements.forEach(el => {
+            setInterval(() => {
+                el.style.animation = 'none';
+                setTimeout(() => {
+                    el.style.animation = 'shake 0.5s ease-in-out, borderGlow 2s linear infinite';
+                }, 10);
+            }, 5000);
+        });
+
+        // Effet de survol pour les détails
+        const detailItems = document.querySelectorAll('.detail-item');
+        detailItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(10px)';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Empêcher la soumission par Enter
+        deleteForm.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !confirmCheckbox.checked) {
+                e.preventDefault();
+                confirmCheckbox.focus();
+            }
+        });
+    });
+
+    // Prévenir la navigation accidentelle
+    window.addEventListener('beforeunload', function(e) {
+        const confirmCheckbox = document.getElementById('confirmDelete');
+        if (confirmCheckbox && confirmCheckbox.checked) {
+            e.preventDefault();
+            e.returnValue = 'Vous avez une suppression en attente de confirmation. Êtes-vous sûr de vouloir quitter ?';
+        }
+    });
+</script>

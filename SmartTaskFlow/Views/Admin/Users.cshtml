@@ -1,0 +1,187 @@
+﻿@model IEnumerable<SmartTaskFlow.Models.User>
+
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-people-fill"></i> Gestion des Utilisateurs
+        </h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-list"></i> Liste des Utilisateurs (@Model.Count())
+            </h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom d'utilisateur</th>
+                                <th>Nom complet</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Tâches</th>
+                                <th>Inscrit le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@user.Username</strong>
+                                    </td>
+                                    <td>@user.FullName</td>
+                                    <td>
+                                        <small>@user.Email</small>
+                                    </td>
+                                    <td>
+                                        @if (user.Role == "Admin")
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-shield-fill"></i> Admin
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-person"></i> User
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Actif
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-x-circle"></i> Inactif
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            @ViewBag.TaskCounts[user.UserId] tâches
+                                        </span>
+                                        <br />
+                                        <small class="text-success">
+                                            @ViewBag.CompletedCounts[user.UserId] complétées
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <small>@user.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="UserDetails" asp-route-id="@user.UserId"
+                                               class="btn btn-sm btn-info" title="Détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            @if (user.UserId != Context.Session.GetInt32("UserId"))
+                                            {
+                                                <form asp-action="ChangeUserRole" method="post" class="d-inline" onsubmit="return confirmRoleChange(event, '@user.Username', this)">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@user.UserId" />
+                                                    <select name="newRole" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()" style="min-width: 100px;">
+                                                        <option value="User" selected="@(user.Role == "User")">User</option>
+                                                        <option value="Admin" selected="@(user.Role == "Admin")">Admin</option>
+                                                    </select>
+                                                </form>
+
+                                                <form asp-action="ToggleUserStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@user.UserId" />
+                                                    <button type="submit"
+                                                            class="btn btn-sm @(user.IsActive ? "btn-secondary" : "btn-success")"
+                                                            onclick="return confirm('@(user.IsActive ? "Désactiver" : "Activer") cet utilisateur ?')"
+                                                            title="@(user.IsActive ? "Désactiver" : "Activer")">
+                                                        <i class="bi bi-@(user.IsActive ? "pause" : "play")-circle"></i>
+                                                    </button>
+                                                </form>
+
+                                                <a asp-action="DeleteUser" asp-route-id="@user.UserId"
+                                                   class="btn btn-sm btn-danger" title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light text-dark">Vous</span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Aucun utilisateur trouvé.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmRoleChange(event, username, form) {
+        var newRole = form.querySelector('select[name="newRole"]').value;
+        var currentRole = form.querySelector('select[name="newRole"] option[selected]');
+
+        // Si le rôle n'a pas changé, ne rien faire
+        if (currentRole && currentRole.value === newRole) {
+            event.preventDefault();
+            return false;
+        }
+
+        var message = "Êtes-vous sûr de vouloir changer le rôle de " + username + " en " + newRole + " ?";
+        if (newRole === "Admin") {
+            message += "\n\nLes administrateurs ont accès à toutes les fonctionnalités !";
+        }
+
+        if (!confirm(message)) {
+            event.preventDefault();
+            // Remettre l'ancienne valeur
+            if (currentRole) {
+                form.querySelector('select[name="newRole"]').value = currentRole.value;
+            }
+            return false;
+        }
+        return true;
+    }
+</script>

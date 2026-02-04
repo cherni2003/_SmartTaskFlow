@@ -1,0 +1,190 @@
+﻿@model dynamic
+@using System.Linq
+
+@{
+
+    var tasksPerDay = (Dictionary<string, int>)Model.TasksPerDay;
+    var maxTasks = tasksPerDay.Values.Any() ? tasksPerDay.Values.Max() : 1;
+    var totalTasksWeek = tasksPerDay.Values.Sum();
+
+    // 🔴 CAST IMPORTANT pour éviter l'erreur GroupBy avec dynamic
+    var categoryStats = ((IEnumerable<dynamic>)Model.CategoryStats).ToList();
+    var groupedCategories = categoryStats
+        .GroupBy(c => (string)c.UserName)
+        .OrderBy(g => g.Key);
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up"></i> Statistiques Détaillées</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    <!-- ===================== STATISTIQUES PAR UTILISATEUR ===================== -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-people"></i> Statistiques par Utilisateur</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.UserStats.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Utilisateur</th>
+                                <th>Total</th>
+                                <th>Complétées</th>
+                                <th>En cours</th>
+                                <th>À faire</th>
+                                <th>En retard</th>
+                                <th>Taux</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stat in Model.UserStats)
+                            {
+                                var completionRate = stat.TotalTasks > 0
+                                ? (stat.CompletedTasks * 100.0 / stat.TotalTasks)
+                                : 0;
+
+                                <tr>
+                                    <td>
+                                        <strong>@stat.User.FullName</strong><br />
+                                        <small class="text-muted">@stat.User.Username</small>
+                                    </td>
+                                    <td><span class="badge bg-primary">@stat.TotalTasks</span></td>
+                                    <td><span class="badge bg-success">@stat.CompletedTasks</span></td>
+                                    <td><span class="badge bg-warning">@stat.InProgressTasks</span></td>
+                                    <td><span class="badge bg-secondary">@stat.PendingTasks</span></td>
+                                    <td>
+                                        @if (stat.OverdueTasks > 0)
+                                        {
+                                            <span class="badge bg-danger">@stat.OverdueTasks</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-dark">0</span>
+                                        }
+                                    </td>
+                                    <td style="width:200px">
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success"
+                                                 style="width:@completionRate%">
+                                                @completionRate.ToString("F1")%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">Aucune statistique utilisateur.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ===================== STATISTIQUES PAR CATÉGORIE (PAR UTILISATEUR) ===================== -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-bookmark"></i> Statistiques par Catégorie</h5>
+        </div>
+        <div class="card-body">
+
+            @if (groupedCategories.Any())
+            {
+                @foreach (var userGroup in groupedCategories)
+                {
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-person-circle"></i> @userGroup.Key
+                        </h5>
+
+                        <div class="row">
+                            @foreach (var stat in userGroup)
+                            {
+                                var completionRate = stat.TotalTasks > 0
+                                ? (stat.CompletedTasks * 100.0 / stat.TotalTasks)
+                                : 0;
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-header"
+                                             style="background-color:@stat.Category.ColorCode;color:white;">
+                                            <strong>
+                                                @stat.Category.Icon @stat.Category.CategoryName
+                                            </strong>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="row text-center">
+                                                <div class="col-6">
+                                                    <h3 class="text-primary mb-0">@stat.TotalTasks</h3>
+                                                    <small>Total</small>
+                                                </div>
+                                                <div class="col-6">
+                                                    <h3 class="text-success mb-0">@stat.CompletedTasks</h3>
+                                                    <small>Complétées</small>
+                                                </div>
+                                            </div>
+
+                                            <hr />
+
+                                            <div class="progress" style="height:18px;">
+                                                <div class="progress-bar bg-success"
+                                                     style="width:@completionRate%">
+                                                    @completionRate.ToString("F0")%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">Aucune catégorie trouvée.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ===================== GRAPHIQUE TÂCHES / JOUR ===================== -->
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar3"></i> Tâches créées (7 derniers jours)</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                @foreach (var day in tasksPerDay)
+                {
+                    var heightPercent = maxTasks > 0 ? (day.Value * 100.0 / maxTasks) : 0;
+
+                    <div class="col text-center">
+                        <div class="bg-info rounded mb-2"
+                             style="height:@(heightPercent * 2)px;min-height:20px;width:40px;margin:auto;">
+                        </div>
+                        <h6>@day.Value</h6>
+                        <small class="text-muted">@day.Key</small>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            <div class="alert alert-light mb-0">
+                <strong>Total sur 7 jours :</strong> @totalTasksWeek tâches
+            </div>
+        </div>
+    </div>
+
+</div>

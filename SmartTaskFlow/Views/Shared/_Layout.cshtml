@@ -1,0 +1,391 @@
+﻿
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartTaskFlow</title>
+    <!-- Bootstrap 5 avec icônes Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Police moderne -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation améliorée */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: var(--shadow);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .navbar-brand i {
+                color: var(--accent-color);
+            }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: var(--transition);
+        }
+
+            .nav-link:hover {
+                color: white !important;
+                background-color: rgba(255, 255, 255, 0.1);
+                transform: translateY(-2px);
+            }
+
+            .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.15);
+                color: white !important;
+            }
+
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Mode intelligent spécial */
+        .nav-item .btn-intelligent {
+            background: linear-gradient(135deg, var(--accent-color), #4895ef);
+            color: white !important;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+            transition: var(--transition);
+        }
+
+            .nav-item .btn-intelligent:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 15px rgba(76, 201, 240, 0.4);
+            }
+
+        /* Contenu principal */
+        .container {
+            flex: 1;
+            max-width: 1400px;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        /* Animation simplifiée sans keyframes */
+        .fade-in {
+            opacity: 0;
+            animation: fadeInAnimation 0.5s ease forwards;
+        }
+
+        @@keyframes fadeInAnimation {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cartes modernes */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #eaeaea;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Footer amélioré */
+        footer {
+            background-color: white;
+            border-top: 1px solid #eaeaea;
+            margin-top: auto;
+            padding: 1.5rem 0 !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+            footer a {
+                color: var(--primary-color);
+                text-decoration: none;
+                transition: var(--transition);
+            }
+
+                footer a:hover {
+                    color: var(--secondary-color);
+                    text-decoration: underline;
+                }
+
+        /* Badges */
+        .badge {
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        /* Boutons */
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(67, 97, 238, 0.25);
+            }
+
+        /* Responsive - Notez le @@ devant media */
+        @@media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem !important;
+                margin: 2px 0;
+            }
+
+            main {
+                padding: 1rem 0;
+            }
+        }
+
+        /* Indicateur de statut */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-low {
+            background-color: var(--success-color);
+        }
+
+        .status-medium {
+            background-color: var(--warning-color);
+        }
+
+        .status-high {
+            background-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-diagram-3-fill"></i>
+                    SmartTaskFlow
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                               asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door me-1"></i>Accueil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "")"
+                               asp-controller="Category" asp-action="Index">
+                                <i class="bi bi-tags me-1"></i>Catégories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Task" && ViewContext.RouteData.Values["Action"]?.ToString() != "SmartSuggestion" ? "active" : "")"
+                               asp-controller="Task" asp-action="Index">
+                                <i class="bi bi-check-square me-1"></i>Mes Tâches
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-intelligent @(ViewContext.RouteData.Values["Action"]?.ToString() == "SmartSuggestion" ? "active" : "")"
+                               asp-controller="Task" asp-action="SmartSuggestion">
+                                <i class="bi bi-robot me-1"></i>Mode Intelligent
+                            </a>
+                        </li>
+                    </ul>
+                    @if (Context.Session.GetString("Role") == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                                <i class="bi bi-shield-lock"></i> Administration
+                            </a>
+                        </li>
+                    }
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                👤 @Context.Session.GetString("FullName")
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">🚪 Déconnexion</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <!-- Section utilisateur (à remplacer dynamiquement) -->
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <!-- En-tête de page dynamique -->
+        @if (ViewData["Title"] != null)
+        {
+            <div class="page-header mb-4 fade-in">
+                <h1 class="display-6 fw-bold mb-2" style="color: var(--primary-color);">@ViewData["Title"]</h1>
+                @if (ViewData["Subtitle"] != null)
+                {
+                    <p class="text-muted lead">@ViewData["Subtitle"]</p>
+                }
+                <hr class="my-3">
+            </div>
+        }
+
+        <main role="main" class="fade-in">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                        <span>&copy; 2025 - SmartTaskFlow - Gestion intelligente des tâches</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                    <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none me-3">
+                        <i class="bi bi-shield-check me-1"></i>Confidentialité
+                    </a>
+                    <a href="#" class="text-decoration-none me-3">
+                        <i class="bi bi-question-circle me-1"></i>Aide
+                    </a>
+                    <a href="#" class="text-decoration-none">
+                        <i class="bi bi-envelope me-1"></i>Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Scripts personnalisés -->
+    <script>
+        // Gestion du menu actif
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation de chargement
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.3s';
+
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 50);
+
+            // Notification toast (exemple)
+            function showNotification(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+                toast.setAttribute('role', 'alert');
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                new bootstrap.Toast(toast).show();
+            }
+
+            // Exemple d'utilisation (à supprimer ou adapter)
+            // showNotification('Bienvenue sur SmartTaskFlow !', 'success');
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

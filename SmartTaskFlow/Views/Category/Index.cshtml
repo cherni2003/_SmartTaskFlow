@@ -1,0 +1,370 @@
+﻿@model IEnumerable<SmartTaskFlow.Models.Category>
+
+
+
+<div class="container mt-4">
+    <!-- En-tête avec bouton flottant mobile -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="bi bi-tags me-3"></i>Gestion des catégories
+            </h1>
+            <p class="text-muted">Organisez vos tâches par catégories pour une meilleure productivité</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm d-none d-md-block">
+            <i class="bi bi-plus-circle me-2"></i>Nouvelle catégorie
+        </a>
+
+        <!-- Bouton flottant pour mobile -->
+        <div class="d-block d-md-none">
+            <a asp-action="Create" class="btn btn-primary btn-lg rounded-circle shadow-lg"
+               style="width: 60px; height: 60px; position: fixed; bottom: 30px; right: 30px; z-index: 1000;">
+                <i class="bi bi-plus fs-4"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages d'alerte -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+                <div class="flex-grow-1">
+                    <strong>Succès !</strong> @TempData["SuccessMessage"]
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <!-- État vide -->
+        <div class="card border-0 shadow-lg mt-5">
+            <div class="card-body text-center py-5">
+                <div class="empty-state-icon mb-4">
+                    <i class="bi bi-tag text-muted" style="font-size: 5rem;"></i>
+                </div>
+                <h3 class="text-muted mb-3">Aucune catégorie créée</h3>
+                <p class="text-muted mb-4">Créez votre première catégorie pour organiser vos tâches efficacement</p>
+                <a asp-action="Create" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-plus-circle me-2"></i>Créer ma première catégorie
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Cartes des catégories -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            @foreach (var category in Model)
+            {
+                <div class="col">
+                    <div class="card category-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                        <div class="card-header rounded-top-3 p-0 overflow-hidden"
+                             style="background: linear-gradient(135deg, @(category.ColorCode ?? "#6c757d") 20%, @(LightenColor(category.ColorCode ?? "#6c757d")) 100%);">
+                            <div class="p-4 text-center text-white">
+                                <div class="category-icon mb-3">
+                                    <i class="bi @(GetIconClass(category.Icon))" style="font-size: 3rem;"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2">@category.CategoryName</h4>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="badge bg-white text-dark fs-6 px-3 py-2 rounded-pill">
+                                        <i class="bi bi-list-task me-2"></i>@category.Tasks.Count tâche(s)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Mini statistiques -->
+                            @if (category.Tasks.Any())
+                            {
+                                var completed = category.Tasks.Count(t => t.Status == "Completed");
+                                var total = category.Tasks.Count;
+                                var percentage = total > 0 ? (completed * 100 / total) : 0;
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <small class="text-muted">Progression</small>
+                                        <small class="fw-bold">@percentage%</small>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: @percentage%"></div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center mb-4">
+                                    <i class="bi bi-info-circle me-2"></i>Aucune tâche pour le moment
+                                </p>
+                            }
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-center">
+                                <a asp-action="Details" asp-route-id="@category.CategoryId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye me-1"></i>Détails
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@category.CategoryId"
+                                   class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@category.CategoryId"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i>Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Section statistiques avancées -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart-line text-primary me-2"></i>
+                    Statistiques détaillées par catégorie
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Catégorie</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">Complétées</th>
+                                <th class="text-center">En cours</th>
+                                <th class="text-center">À faire</th>
+                                <th class="text-center pe-4">Taux de complétion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model)
+                            {
+                                var total = category.Tasks.Count;
+                                var completed = category.Tasks.Count(t => t.Status == "Completed");
+                                var inProgress = category.Tasks.Count(t => t.Status == "InProgress");
+                                var todo = category.Tasks.Count(t => t.Status == "ToDo");
+                                var completionRate = total > 0 ? (int)((double)completed / total * 100) : 0;
+                                var color = category.ColorCode ?? "#6c757d";
+
+                                <tr class="align-middle">
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="color-indicator me-3"
+                                                 style="background-color: @color; width: 12px; height: 12px; border-radius: 50%;"></div>
+                                            <div>
+                                                <div class="fw-semibold">@category.CategoryName</div>
+                                                <small class="text-muted">@category.Tasks.Count tâches</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark fs-6 px-3 py-2 rounded-pill">
+                                            @total
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success fs-6 px-3 py-2">
+                                            <i class="bi bi-check-circle me-1"></i>@completed
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info bg-opacity-10 text-info fs-6 px-3 py-2">
+                                            <i class="bi bi-arrow-repeat me-1"></i>@inProgress
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fs-6 px-3 py-2">
+                                            <i class="bi bi-clock me-1"></i>@todo
+                                        </span>
+                                    </td>
+                                    <td class="pe-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-3">
+                                                <div class="progress" style="height: 10px;">
+                                                    <div class="progress-bar bg-success"
+                                                         style="width: @completionRate%;"
+                                                         role="progressbar">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="fw-bold" style="min-width: 45px;">
+                                                @completionRate%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                            <!-- Total général -->
+                            @{
+                                var totalTasks = Model.Sum(c => c.Tasks.Count);
+                                var totalCompleted = Model.Sum(c => c.Tasks.Count(t => t.Status == "Completed"));
+                                var totalInProgress = Model.Sum(c => c.Tasks.Count(t => t.Status == "InProgress"));
+                                var totalTodo = Model.Sum(c => c.Tasks.Count(t => t.Status == "ToDo"));
+                                var totalCompletionRate = totalTasks > 0 ? (int)((double)totalCompleted / totalTasks * 100) : 0;
+                            }
+                            <tr class="table-light align-middle">
+                                <td class="ps-4 fw-bold">Total général</td>
+                                <td class="text-center fw-bold">@totalTasks</td>
+                                <td class="text-center fw-bold">@totalCompleted</td>
+                                <td class="text-center fw-bold">@totalInProgress</td>
+                                <td class="text-center fw-bold">@totalTodo</td>
+                                <td class="pe-4 fw-bold">@totalCompletionRate%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résumé rapide -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-tags fs-1 text-primary mb-3"></i>
+                        <h3 class="fw-bold">@Model.Count()</h3>
+                        <p class="text-muted mb-0">Catégories</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+                        <h3 class="fw-bold">@totalCompleted</h3>
+                        <p class="text-muted mb-0">Tâches terminées</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-info bg-opacity-10">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-arrow-repeat fs-1 text-info mb-3"></i>
+                        <h3 class="fw-bold">@totalInProgress</h3>
+                        <p class="text-muted mb-0">En cours</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-secondary bg-opacity-10">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-clock fs-1 text-secondary mb-3"></i>
+                        <h3 class="fw-bold">@totalTodo</h3>
+                        <p class="text-muted mb-0">À faire</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Styles additionnels -->
+<style>
+    .category-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+
+    .hover-shadow {
+        transition: box-shadow 0.3s ease;
+    }
+
+        .hover-shadow:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .color-indicator {
+        transition: transform 0.3s ease;
+    }
+
+        .color-indicator:hover {
+            transform: scale(1.3);
+        }
+
+    .btn-outline-primary:hover .bi-eye,
+    .btn-outline-warning:hover .bi-pencil,
+    .btn-outline-danger:hover .bi-trash {
+        animation: bounce 0.5s;
+    }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+    .empty-state-icon {
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+    }
+
+        .empty-state-icon:hover {
+            opacity: 0.8;
+        }
+</style>
+
+@functions {
+    // Fonction pour éclaircir une couleur
+    private string LightenColor(string color)
+    {
+        // Simplification - en production, utilisez une bibliothèque de couleurs
+        return color + "80"; // Ajoute de la transparence
+    }
+
+    // Fonction pour convertir les émojis en classes Bootstrap Icons
+    private string GetIconClass(string icon)
+    {
+        if (string.IsNullOrEmpty(icon)) return "bi-folder";
+
+        var iconMap = new Dictionary<string, string>
+        {
+            { "📁", "bi-folder" },
+            { "📊", "bi-graph-up" },
+            { "💼", "bi-briefcase" },
+            { "🎯", "bi-bullseye" },
+            { "🛒", "bi-cart" },
+            { "🏠", "bi-house" },
+            { "📝", "bi-pencil" },
+            { "📅", "bi-calendar" },
+            { "👥", "bi-people" },
+            { "💰", "bi-cash" },
+            { "🚀", "bi-rocket" },
+            { "❤️", "bi-heart" },
+            { "⭐", "bi-star" },
+            { "🔒", "bi-lock" },
+            { "🌐", "bi-globe" }
+        };
+
+        return iconMap.ContainsKey(icon) ? iconMap[icon] : "bi-tag";
+    }
+}

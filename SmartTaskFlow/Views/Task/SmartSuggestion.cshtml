@@ -1,0 +1,219 @@
+﻿@model SmartTaskFlow.Models.TaskItem
+
+@{
+    ViewData["Title"] = "Suggestion Intelligente";
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1>🤖 Que faire maintenant ?</h1>
+        <p class="lead text-muted">Le système analyse vos tâches et vous propose la meilleure option</p>
+    </div>
+
+    @if (Model == null)
+    {
+        <!-- Formulaire de sélection -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3>⚙️ Configurez votre session</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="get" asp-action="GetSuggestion">
+
+                            <!-- Temps disponible -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-5">⏱️ Combien de temps avez-vous ?</label>
+                                <div class="row g-2">
+                                    <div class="col-6 col-md-3">
+                                        <input type="radio" class="btn-check" name="availableTime" id="time15" value="15" required>
+                                        <label class="btn btn-outline-primary w-100" for="time15">15 min</label>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <input type="radio" class="btn-check" name="availableTime" id="time30" value="30" required>
+                                        <label class="btn btn-outline-primary w-100" for="time30">30 min</label>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <input type="radio" class="btn-check" name="availableTime" id="time60" value="60" required>
+                                        <label class="btn btn-outline-primary w-100" for="time60">1 heure</label>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <input type="radio" class="btn-check" name="availableTime" id="time120" value="120" required>
+                                        <label class="btn btn-outline-primary w-100" for="time120">2 heures</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Niveau d'énergie -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-5">⚡ Quel est votre niveau d'énergie ?</label>
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-4">
+                                        <input type="radio" class="btn-check" name="energyLevel" id="energyLow" value="Low" required>
+                                        <label class="btn btn-outline-secondary w-100 py-3" for="energyLow">
+                                            <div class="fs-3">😴</div>
+                                            <div>Faible</div>
+                                            <small class="text-muted">Tâches simples</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="radio" class="btn-check" name="energyLevel" id="energyMedium" value="Medium" required>
+                                        <label class="btn btn-outline-warning w-100 py-3" for="energyMedium">
+                                            <div class="fs-3">😊</div>
+                                            <div>Moyen</div>
+                                            <small class="text-muted">Tâches normales</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="radio" class="btn-check" name="energyLevel" id="energyHigh" value="High" required>
+                                        <label class="btn btn-outline-success w-100 py-3" for="energyHigh">
+                                            <div class="fs-3">🚀</div>
+                                            <div>Élevé</div>
+                                            <small class="text-muted">Tâches complexes</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bouton de suggestion -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    🎯 Obtenir ma suggestion
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Info supplémentaire -->
+                <div class="alert alert-info mt-4">
+                    <h6>💡 Comment ça marche ?</h6>
+                    <p class="mb-0">
+                        L'algorithme intelligent analyse vos tâches en fonction de :
+                        <br>✅ Votre temps disponible
+                        <br>✅ Votre niveau d'énergie actuel
+                        <br>✅ La priorité des tâches
+                        <br>✅ Les deadlines approchantes
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Suggestion trouvée -->
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow-lg border-success">
+                    <div class="card-header bg-success text-white text-center">
+                        <h3>🎯 Voici ce que vous devriez faire maintenant !</h3>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <!-- Titre de la tâche -->
+                        <div class="text-center mb-4">
+                            <div style="font-size: 4rem;">@(Model.Category?.Icon ?? "📌")</div>
+                            <h2 class="mb-3">@Model.Title</h2>
+
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <p class="lead text-muted">@Model.Description</p>
+                            }
+                        </div>
+
+                        <!-- Caractéristiques de la tâche -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-light text-center h-100">
+                                    <div class="card-body">
+                                        <div class="fs-3">⏱️</div>
+                                        <div class="fw-bold">@Model.FormattedDuration</div>
+                                        <small class="text-muted">Durée estimée</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light text-center h-100">
+                                    <div class="card-body">
+                                        <div class="fs-3">⚡</div>
+                                        <div class="fw-bold">@Model.EnergyLevelFrench</div>
+                                        <small class="text-muted">Énergie requise</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light text-center h-100">
+                                    <div class="card-body">
+                                        <div class="fs-3">🎯</div>
+                                        <div class="fw-bold">@Model.PriorityBadge</div>
+                                        <small class="text-muted">Priorité</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light text-center h-100">
+                                    <div class="card-body">
+                                        <div class="fs-3">📅</div>
+                                        <div class="fw-bold">
+                                            @if (Model.Deadline.HasValue)
+                                            {
+                                                @Model.Deadline.Value.ToString("dd/MM")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Aucune</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">Deadline</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.Category != null)
+                        {
+                            <div class="text-center mb-4">
+                                <span class="badge fs-6" style="background-color: @Model.Category.ColorCode;">
+                                    @Model.Category.Icon @Model.Category.CategoryName
+                                </span>
+                            </div>
+                        }
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-info btn-lg">
+                                👁️ Voir les détails
+                            </a>
+
+                            <form asp-action="CompleteTask" asp-route-id="@Model.TaskId" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    ✅ Commencer maintenant !
+                                </button>
+                            </form>
+
+                            <a asp-action="SmartSuggestion" class="btn btn-secondary btn-lg">
+                                🔄 Autre suggestion
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pourquoi cette tâche ? -->
+                <div class="alert alert-success mt-4">
+                    <h6>💡 Pourquoi cette tâche ?</h6>
+                    <ul class="mb-0">
+                        <li>✅ Correspond à votre temps disponible (@Model.FormattedDuration)</li>
+                        <li>✅ Adaptée à votre niveau d'énergie (@Model.EnergyLevelFrench)</li>
+                        <li>✅ Priorité : @Model.Priority/5</li>
+                        @if (Model.Deadline.HasValue)
+                        {
+                            <li>✅ Deadline : @Model.Deadline.Value.ToString("dd/MM/yyyy")</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>

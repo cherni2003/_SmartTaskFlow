@@ -1,0 +1,868 @@
+﻿@model SmartTaskFlow.Models.TaskItem
+
+@{
+    ViewData["Title"] = "Détails de la tâche";
+    var categoryColor = Model.Category?.ColorCode ?? "#6c757d";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center g-4">
+        <!-- Sidebar avec actions rapides -->
+        <div class="col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 1rem;">
+                <div class="card-body p-3">
+                    <h6 class="fw-bold text-center mb-3">
+                        <i class="bi bi-lightning-charge text-primary me-2"></i>
+                        Actions rapides
+                    </h6>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Retour
+                        </a>
+
+                        @if (Model.Status != "Completed")
+                        {
+                            <form asp-action="CompleteTask" asp-route-id="@Model.TaskId" method="post" class="d-grid">
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn btn-success btn-sm" id="completeTaskBtn">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Terminer
+                                </button>
+                            </form>
+                        }
+
+                        <a asp-action="Edit" asp-route-id="@Model.TaskId" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil me-2"></i>
+                            Modifier
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@Model.TaskId" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash me-2"></i>
+                            Supprimer
+                        </a>
+
+                        <a asp-action="SmartSuggestion" asp-route-taskId="@Model.TaskId" class="btn btn-info btn-sm">
+                            <i class="bi bi-robot me-2"></i>
+                            Suggestion IA
+                        </a>
+                    </div>
+
+                    <!-- Statistiques rapides -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="fw-bold mb-3">Statistiques</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Durée</span>
+                            <span class="fw-semibold">@Model.FormattedDuration</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Priorité</span>
+                            <span>@Html.Raw(Model.PriorityBadge)</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Énergie</span>
+                            <span class="fw-semibold text-warning">@Model.EnergyLevelFrench</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Statut</span>
+                            <span class="badge @(Model.Status == "Completed" ? "bg-success" : Model.Status == "InProgress" ? "bg-primary" : "bg-secondary")">
+                                @Model.StatusFrench
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-lg-9 col-xl-8">
+            <!-- Header avec breadcrumb et titre -->
+            <div class="page-header mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-action="Index">Tâches</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h1 class="display-6 fw-bold mb-2 text-gradient" style="--gradient-start: @categoryColor; --gradient-end: color-mix(in srgb, @categoryColor 80%, black 20%);">
+                            <span class="me-2">@(Model.Category?.Icon ?? "📌")</span>
+                            @Model.Title
+                        </h1>
+                        <p class="text-muted">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Créée le @Model.CreatedAt.ToString("dd MMMM yyyy à HH:mm")
+                        </p>
+                    </div>
+
+                    <!-- Badge de statut principal -->
+                    <div class="status-badge @(Model.Status == "Completed" ? "completed" : Model.Status == "InProgress" ? "in-progress" : "pending")">
+                        <div class="status-content">
+                            <i class="status-icon @(Model.Status == "Completed" ? "bi-check-circle-fill" : Model.Status == "InProgress" ? "bi-arrow-repeat" : "bi-clock")"></i>
+                            <span class="status-text">@Model.StatusFrench</span>
+                        </div>
+                        <div class="status-glow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte principale -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- En-tête avec dégradé -->
+                <div class="card-header p-0 border-0">
+                    <div class="task-header" style="background: linear-gradient(135deg, @categoryColor 0%, color-mix(in srgb, @categoryColor 80%, black 20%) 100%);">
+                        <div class="p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <div class="category-icon me-3">
+                                            <div class="icon-wrapper bg-white bg-opacity-25 rounded-3 p-3">
+                                                <span class="display-6">@(Model.Category?.Icon ?? "📌")</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            @if (Model.Category != null)
+                                            {
+                                                <h3 class="text-white h5 mb-2 fw-bold">@Model.Category.CategoryName</h3>
+                                                <p class="text-white opacity-75 mb-0">
+                                                    <i class="bi bi-tag me-1"></i>
+                                                    Catégorie associée
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-white opacity-75">Aucune catégorie</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    @if (Model.IsOverdue)
+                                    {
+                                        <div class="overdue-indicator animate-pulse">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                            EN RETARD
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <!-- Description -->
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-icon me-2">
+                                    <i class="bi bi-text-paragraph fs-4 text-primary"></i>
+                                </div>
+                                <h4 class="fw-bold mb-0">Description</h4>
+                            </div>
+                            <div class="description-box p-4 rounded-3">
+                                <p class="mb-0">@Model.Description</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Métriques en grille -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="metric-card time-card" data-duration-text="@Model.FormattedDuration">
+                                <div class="metric-icon">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <h3 class="metric-value">@Model.FormattedDuration</h3>
+                                    <p class="metric-label">Durée estimée</p>
+                                </div>
+                                <div class="metric-progress"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="metric-card energy-card" data-energy="@Model.EnergyLevel">
+                                <div class="metric-icon">
+                                    <i class="bi bi-battery-full"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <h3 class="metric-value">@Model.EnergyLevelFrench</h3>
+                                    <p class="metric-label">Niveau d'énergie</p>
+                                </div>
+                                <div class="energy-bars">
+                                    <div class="energy-bar @(Model.EnergyLevel == "High" || Model.EnergyLevel == "Medium" || Model.EnergyLevel == "Low" ? "active" : "")"></div>
+                                    <div class="energy-bar @(Model.EnergyLevel == "High" || Model.EnergyLevel == "Medium" ? "active" : "")"></div>
+                                    <div class="energy-bar @(Model.EnergyLevel == "High" ? "active" : "")"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="metric-card priority-card" data-priority="@Model.Priority">
+                                <div class="metric-icon">
+                                    <i class="bi bi-flag-fill"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <h3 class="metric-value">@Model.Priority<span class="text-muted">/5</span></h3>
+                                    <p class="metric-label">Priorité</p>
+                                </div>
+                                <div class="priority-stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi bi-star-fill @(i <= Model.Priority ? "active" : "")"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="metric-card deadline-card @(Model.IsOverdue ? "overdue" : "")" data-deadline="@Model.Deadline?.ToString("o")">
+                                <div class="metric-icon">
+                                    <i class="bi bi-calendar-check-fill"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <h3 class="metric-value">
+                                        @if (Model.Deadline.HasValue)
+                                        {
+                                            @Model.Deadline.Value.ToString("dd/MM")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </h3>
+                                    <p class="metric-label">Deadline</p>
+                                </div>
+                                @if (Model.Deadline.HasValue)
+                                {
+                                    <div class="deadline-countdown" data-deadline="@Model.Deadline.Value.ToString("o")"></div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations détaillées en deux colonnes -->
+                    <div class="row g-4">
+                        <!-- Colonne gauche -->
+                        <div class="col-lg-6">
+                            <div class="info-section">
+                                <div class="section-header">
+                                    <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                                    <h5 class="fw-bold mb-0">Informations temporelles</h5>
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="bi bi-plus-circle me-2"></i>
+                                            <span>Création</span>
+                                        </div>
+                                        <div class="info-value">
+                                            @Model.CreatedAt.ToString("dd MMM yyyy à HH:mm")
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="bi bi-arrow-clockwise me-2"></i>
+                                            <span>Modification</span>
+                                        </div>
+                                        <div class="info-value">
+                                            @Model.UpdatedAt.ToString("dd MMM yyyy à HH:mm")
+                                        </div>
+                                    </div>
+                                    @if (Model.CompletedAt.HasValue)
+                                    {
+                                        <div class="info-item">
+                                            <div class="info-label">
+                                                <i class="bi bi-check-circle-fill me-2 text-success"></i>
+                                                <span>Complétion</span>
+                                            </div>
+                                            <div class="info-value text-success">
+                                                @Model.CompletedAt.Value.ToString("dd MMM yyyy à HH:mm")
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne droite -->
+                        <div class="col-lg-6">
+                            <div class="info-section">
+                                <div class="section-header">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i>
+                                    <h5 class="fw-bold mb-0">Responsable</h5>
+                                </div>
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <div class="avatar-circle" data-initials="@Model.User.Username?.Substring(0, Math.Min(2, Model.User.Username.Length))?.ToUpper()">
+                                            @if (string.IsNullOrEmpty(Model.User.Username))
+                                            {
+                                                <i class="bi bi-person-fill"></i>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h6 class="fw-bold mb-1">@Model.User.FullName</h6>
+                                        <p class="text-muted small mb-0">@Model.User.Username</p>
+                                        <p class="small text-muted mb-0">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            @Model.User.Email
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barre de progression -->
+                    @if (Model.Status != "Completed")
+                    {
+                        <div class="mt-5 pt-4 border-top">
+                            <div class="progress-section">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">
+                                        <i class="bi bi-speedometer2 me-2 text-primary"></i>
+                                        Progression de la tâche
+                                    </h5>
+                                    <span class="badge bg-primary">@(Model.Status == "InProgress" ? "50%" : "0%")</span>
+                                </div>
+                                <div class="progress-wrapper">
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar progress-animate"
+                                             style="width: @(Model.Status == "InProgress" ? "50%" : "0%");"></div>
+                                    </div>
+                                    <div class="progress-markers">
+                                        <div class="marker @(Model.Status == "Pending" ? "active" : "")" style="left: 0;">
+                                            <div class="marker-dot"></div>
+                                            <span class="marker-label">À faire</span>
+                                        </div>
+                                        <div class="marker @(Model.Status == "InProgress" ? "active" : "")" style="left: 50%;">
+                                            <div class="marker-dot"></div>
+                                            <span class="marker-label">En cours</span>
+                                        </div>
+                                        <div class="marker" style="left: 100%;">
+                                            <div class="marker-dot"></div>
+                                            <span class="marker-label">Terminée</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --category-color: @categoryColor;
+        --primary-color: #4361ee;
+        --success-color: #06d6a0;
+        --warning-color: #ffd166;
+        --danger-color: #ef476f;
+        --info-color: #118ab2;
+    }
+
+    /* Styles globaux */
+    .text-gradient {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Header fixe */
+    .page-header {
+        background: white;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    /* Badge de statut amélioré */
+    .status-badge {
+        position: relative;
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, var(--success-color), color-mix(in srgb, var(--success-color) 80%, black 20%));
+            color: white;
+        }
+
+        .status-badge.in-progress {
+            background: linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 80%, black 20%));
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, var(--warning-color), color-mix(in srgb, var(--warning-color) 80%, black 20%));
+            color: #212529;
+        }
+
+    .status-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .status-glow {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: inherit;
+        filter: blur(15px);
+        opacity: 0.5;
+        z-index: 1;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    /* Cartes de métriques */
+    .metric-card {
+        background: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--category-color);
+        }
+
+        .metric-card.overdue {
+            animation: pulseWarning 2s ease-in-out infinite;
+        }
+
+    .metric-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--category-color);
+        opacity: 0.9;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        line-height: 1;
+    }
+
+    .metric-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 0;
+    }
+
+    /* Barres d'énergie */
+    .energy-bars {
+        display: flex;
+        gap: 4px;
+        margin-top: 1rem;
+    }
+
+    .energy-bar {
+        flex: 1;
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+        .energy-bar.active {
+            background: var(--warning-color);
+        }
+
+        .energy-bar:nth-child(1) {
+            opacity: 0.6;
+        }
+
+        .energy-bar:nth-child(2) {
+            opacity: 0.8;
+        }
+
+        .energy-bar:nth-child(3) {
+            opacity: 1;
+        }
+
+    /* Étoiles de priorité */
+    .priority-stars {
+        display: flex;
+        gap: 2px;
+        margin-top: 1rem;
+    }
+
+        .priority-stars i {
+            color: #dee2e6;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+            .priority-stars i.active {
+                color: var(--info-color);
+            }
+
+    /* Boîte de description */
+    .description-box {
+        background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+        border: 1px solid rgba(67, 97, 238, 0.1);
+        border-left: 4px solid var(--primary-color);
+        line-height: 1.7;
+    }
+
+    /* Grille d'informations */
+    .info-section {
+        background: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .info-item:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    /* Carte utilisateur */
+    .user-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(67, 97, 238, 0.05);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+        .user-card:hover {
+            background: rgba(67, 97, 238, 0.1);
+            transform: translateX(5px);
+        }
+
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    /* Indicateur de retard */
+    .overdue-indicator {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, var(--danger-color), color-mix(in srgb, var(--danger-color) 80%, black 20%));
+        color: white;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    /* Barre de progression */
+    .progress-wrapper {
+        position: relative;
+    }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(0,0,0,0.05);
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-animate::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    .progress-markers {
+        position: absolute;
+        top: -10px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .marker {
+        position: absolute;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+
+    .marker-dot {
+        width: 12px;
+        height: 12px;
+        background: #dee2e6;
+        border-radius: 50%;
+        margin: 0 auto 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .marker.active .marker-dot {
+        background: var(--primary-color);
+        transform: scale(1.3);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .marker-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        white-space: nowrap;
+    }
+
+    /* Animations */
+    .animate-pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .sticky-top {
+        position: sticky;
+        top: 1rem;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    @@keyframes pulseWarning {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(239, 71, 111, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(239, 71, 111, 0);
+        }
+    }
+
+    @@keyframes glow {
+        from {
+            opacity: 0.3;
+        }
+
+        to {
+            opacity: 0.6;
+        }
+    }
+
+    @@keyframes shimmer {
+        100% {
+            left: 100%;
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .metric-value {
+            font-size: 1.5rem;
+        }
+
+        .display-6 {
+            font-size: 1.75rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .user-card {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Confirmation pour terminer la tâche
+            const completeBtn = document.getElementById('completeTaskBtn');
+            if (completeBtn) {
+                completeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Terminer la tâche',
+                        text: 'Êtes-vous sûr de vouloir marquer cette tâche comme terminée ?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, terminer',
+                        cancelButtonText: 'Annuler',
+                        confirmButtonColor: '#06d6a0',
+                        customClass: {
+                            popup: 'rounded-4'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.closest('form').submit();
+                        }
+                    });
+                });
+            }
+
+            // Animation des métriques
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('.metric-icon');
+                    icon.style.transform = 'scale(1.1) rotate(5deg)';
+                    icon.style.transition = 'transform 0.3s ease';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('.metric-icon');
+                    icon.style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+
+            // Compte à rebours pour la deadline
+            const deadlineCountdown = document.querySelector('.deadline-countdown');
+            if (deadlineCountdown) {
+                const deadline = new Date(deadlineCountdown.dataset.deadline);
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = deadline - now;
+
+                    if (diff <= 0) {
+                        deadlineCountdown.innerHTML = '<span class="text-danger">Échue</span>';
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                    if (days > 0) {
+                        deadlineCountdown.innerHTML = `${days}j ${hours}h`;
+                    } else if (hours > 0) {
+                        deadlineCountdown.innerHTML = `${hours}h`;
+                    } else {
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        deadlineCountdown.innerHTML = `${minutes}min`;
+                    }
+                }
+
+                updateCountdown();
+                setInterval(updateCountdown, 60000); // Mettre à jour chaque minute
+            }
+
+            // Animation des barres d'énergie
+            const energyBars = document.querySelectorAll('.energy-bar');
+            energyBars.forEach((bar, index) => {
+                setTimeout(() => {
+                    if (bar.classList.contains('active')) {
+                        bar.style.transform = 'scaleY(1.5)';
+                        setTimeout(() => {
+                            bar.style.transform = 'scaleY(1)';
+                        }, 300);
+                    }
+                }, index * 200);
+            });
+
+            // Effet de parallaxe sur le header
+            const taskHeader = document.querySelector('.task-header');
+            if (taskHeader) {
+                window.addEventListener('scroll', function() {
+                    const scrolled = window.pageYOffset;
+                    const rate = scrolled * -0.5;
+                    taskHeader.style.backgroundPositionY = rate + 'px';
+                });
+            }
+
+            // Copier les informations
+            const infoItems = document.querySelectorAll('.info-item');
+            infoItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const value = this.querySelector('.info-value').textContent.trim();
+
+                    navigator.clipboard.writeText(value).then(() => {
+                        const originalText = this.querySelector('.info-value').textContent;
+                        this.querySelector('.info-value').textContent = 'Copié !';
+
+                        setTimeout(() => {
+                            this.querySelector('.info-value').textContent = originalText;
+                        }, 1500);
+                    });
+                });
+            });
+        });
+    </script>
+}

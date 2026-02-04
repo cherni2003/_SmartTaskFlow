@@ -1,0 +1,408 @@
+﻿@model SmartTaskFlow.Models.Category
+
+@{
+    ViewData["Subtitle"] = "Personnalisez votre catégorie";
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- En-tête -->
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div class="animate-slide-up">
+                    <div class="badge bg-gradient-warning bg-opacity-10 text-warning rounded-pill px-4 py-2 mb-3 d-inline-flex align-items-center">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        <span class="fw-semibold">Édition</span>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-0">✏️ Modifier la catégorie</h1>
+                    <p class="text-muted mb-0">Personnalisez les détails de votre catégorie</p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4 py-3 animate-slide-up" style="animation-delay: 0.1s">
+                    <i class="bi bi-arrow-left me-2"></i>Retour
+                </a>
+            </div>
+
+            <!-- Carte principale -->
+            <div class="card border-0 shadow-xl rounded-4 overflow-hidden animate-fade-in">
+                <div class="card-header bg-gradient-warning bg-opacity-10 border-0 py-4 px-5">
+                    <div class="d-flex align-items-center">
+                        <div class="edit-icon bg-gradient-warning rounded-circle d-inline-flex align-items-center justify-content-center p-3 me-3">
+                            <i class="bi bi-pencil-square text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Modification de catégorie</h5>
+                            <small class="text-muted">Tous les champs marqués d'un * sont obligatoires</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-5 rounded-3 border-0" role="alert">
+                            <div class="me-3">
+                                <div class="alert-icon bg-danger bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-0">Des erreurs sont présentes</h6>
+                                <p class="mb-0">Veuillez corriger les erreurs ci-dessous</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <input type="hidden" asp-for="CategoryId" />
+
+                        <!-- Informations principales -->
+                        <div class="row mb-5">
+                            <div class="col-md-8">
+                                <!-- Nom de la catégorie -->
+                                <div class="mb-4">
+                                    <label asp-for="CategoryName" class="form-label fw-bold d-flex align-items-center">
+                                        <i class="bi bi-card-heading me-2 text-primary"></i>
+                                        Nom de la catégorie *
+                                        <span class="text-danger ms-1">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-tag text-muted"></i>
+                                        </span>
+                                        <input asp-for="CategoryName" class="form-control border-start-0 ps-0"
+                                               placeholder="Ex: Travail, Personnel, Projets..."
+                                               required />
+                                    </div>
+                                    <span asp-validation-for="CategoryName" class="text-danger small"></span>
+                                    <div class="form-text">
+                                        Choisissez un nom clair et descriptif pour votre catégorie
+                                    </div>
+                                </div>
+
+                                <!-- Icône -->
+                                <div class="mb-4">
+                                    <label asp-for="Icon" class="form-label fw-bold d-flex align-items-center">
+                                        <i class="bi bi-emoji-smile me-2 text-warning"></i>
+                                        Icône
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-emoji-smile text-muted"></i>
+                                        </span>
+                                        <input asp-for="Icon" class="form-control border-start-0 ps-0"
+                                               placeholder="Ex: 🎯, 💼, 🎨..."
+                                               maxlength="2" />
+                                    </div>
+                                    <span asp-validation-for="Icon" class="text-danger small"></span>
+                                    <div class="form-text d-flex align-items-center">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Choisissez un emoji (1-2 caractères).
+                                        <a href="https://emojipedia.org/" target="_blank" class="ms-2">Explorer les emojis</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aperçu -->
+                            <div class="col-md-4">
+                                <div class="preview-wrapper">
+                                    <label class="form-label fw-bold d-flex align-items-center mb-3">
+                                        <i class="bi bi-eye me-2 text-success"></i>
+                                        Aperçu en direct
+                                    </label>
+                                    <div class="preview-card card border-0 shadow-sm h-100 overflow-hidden rounded-4"
+                                         id="preview"
+                                         style="background: linear-gradient(135deg, @Model.ColorCode 0%, darken(@Model.ColorCode, 20%) 100%);">
+                                        <div class="card-body d-flex flex-column justify-content-center align-items-center text-white py-5">
+                                            <div class="preview-icon mb-3" id="previewIcon" style="font-size: 3.5rem;">
+                                                @Model.Icon
+                                            </div>
+                                            <h4 class="fw-bold text-center mb-0" id="previewName">
+                                                @Model.CategoryName
+                                            </h4>
+                                            <div class="preview-badge mt-3 bg-white bg-opacity-20 rounded-pill px-3 py-1">
+                                                Catégorie
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Couleur -->
+                        <div class="mb-5">
+                            <label class="form-label fw-bold d-flex align-items-center mb-4">
+                                <i class="bi bi-palette me-2 text-info"></i>
+                                Personnalisation de la couleur
+                            </label>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label asp-for="ColorCode" class="form-label fw-semibold">Couleur personnalisée</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-eyedropper text-muted"></i>
+                                        </span>
+                                        <input asp-for="ColorCode" type="text"
+                                               class="form-control border-start-0 ps-0 color-text-input"
+                                               placeholder="#4361ee"
+                                               pattern="^#[0-9A-Fa-f]{6}$" />
+                                        <input asp-for="ColorCode" type="color"
+                                               class="form-control form-control-color color-picker"
+                                               style="width: 60px; height: 42px;" />
+                                    </div>
+                                    <span asp-validation-for="ColorCode" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Palette de couleurs prédéfinies -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Couleurs suggérées</label>
+                                    <div class="color-palette d-flex gap-2 flex-wrap">
+                                        @{
+                                            var colors = new[] { "#4361ee", "#06d6a0", "#ffd166", "#ef476f", "#118ab2", "#7209b7", "#f72585", "#4cc9f0" };
+                                        }
+                                        @foreach (var color in colors)
+                                        {
+                                            <button type="button"
+                                                    class="color-option rounded-circle border-0"
+                                                    style="width: 40px; height: 40px; background-color: @color;"
+                                                    data-color="@color"
+                                                    title="@color">
+                                                @if (color == Model.ColorCode)
+                                                {
+                                                    <i class="bi bi-check text-white"></i>
+                                                }
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 d-flex align-items-center">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Annuler
+                                </a>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <a asp-action="Delete" asp-route-id="@Model.CategoryId"
+                                   class="btn btn-outline-danger px-4 py-2 d-flex align-items-center"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
+                                    <i class="bi bi-trash me-2"></i>
+                                    Supprimer
+                                </a>
+                                <button type="submit"
+                                        class="btn btn-warning btn-lg px-5 py-3 shadow-sm-hover d-flex align-items-center">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Enregistrer les modifications
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <style>
+        /* Styles spécifiques à l'édition */
+        .edit-icon {
+            width: 56px;
+            height: 56px;
+        }
+
+        .preview-wrapper {
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-card {
+            transition: all 0.3s ease;
+            min-height: 200px;
+        }
+
+        .preview-icon {
+            transition: all 0.3s ease;
+        }
+
+        .color-picker {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 0;
+        }
+
+        .color-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent !important;
+        }
+
+            .color-option:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .color-option.active {
+                border-color: #212529 !important;
+                transform: scale(1.1);
+            }
+
+        .color-palette {
+            min-height: 44px;
+        }
+
+        .input-group:focus-within {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+        }
+
+        /* Gradient pour l'aperçu */
+        .preview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.1) 100%);
+            pointer-events: none;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.querySelector('input[name="CategoryName"]');
+            const iconInput = document.querySelector('input[name="Icon"]');
+            const colorTextInput = document.querySelector('.color-text-input');
+            const colorPicker = document.querySelector('.color-picker');
+            const colorOptions = document.querySelectorAll('.color-option');
+
+            const preview = document.getElementById('preview');
+            const previewName = document.getElementById('previewName');
+            const previewIcon = document.getElementById('previewIcon');
+
+            // Fonction pour assombrir une couleur
+            function darkenColor(color, percent) {
+                let r = parseInt(color.slice(1, 3), 16);
+                let g = parseInt(color.slice(3, 5), 16);
+                let b = parseInt(color.slice(5, 7), 16);
+
+                r = Math.floor(r * (100 - percent) / 100);
+                g = Math.floor(g * (100 - percent) / 100);
+                b = Math.floor(b * (100 - percent) / 100);
+
+                return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+            }
+
+            // Fonction de mise à jour de l'aperçu
+            function updatePreview() {
+                const name = nameInput.value || 'Nom de la catégorie';
+                const icon = iconInput.value || '📁';
+                const color = colorTextInput.value || '#4361ee';
+
+                // Validation de la couleur
+                const isValidColor = /^#[0-9A-F]{6}$/i.test(color);
+                const displayColor = isValidColor ? color : '#4361ee';
+
+                // Mise à jour des éléments
+                previewName.textContent = name;
+                previewIcon.textContent = icon;
+
+                // Mise à jour du gradient
+                const darkerColor = darkenColor(displayColor, 20);
+                preview.style.background = `linear-gradient(135deg, ${displayColor} 0%, ${darkerColor} 100%)`;
+
+                // Mise à jour du color picker
+                colorPicker.value = displayColor;
+                colorTextInput.value = displayColor;
+
+                // Mise à jour des options de couleur actives
+                colorOptions.forEach(option => {
+                    if (option.getAttribute('data-color') === displayColor) {
+                        option.classList.add('active');
+                        option.innerHTML = '<i class="bi bi-check text-white"></i>';
+                    } else {
+                        option.classList.remove('active');
+                        option.innerHTML = '';
+                    }
+                });
+            }
+
+            // Écouteurs d'événements
+            nameInput.addEventListener('input', updatePreview);
+            iconInput.addEventListener('input', updatePreview);
+            colorTextInput.addEventListener('input', updatePreview);
+            colorPicker.addEventListener('input', updatePreview);
+
+            // Écouteurs pour les options de couleur
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const selectedColor = this.getAttribute('data-color');
+                    colorTextInput.value = selectedColor;
+                    colorPicker.value = selectedColor;
+                    updatePreview();
+                });
+            });
+
+            // Validation en temps réel
+            nameInput.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            // Animation de l'icône
+            previewIcon.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.2) rotate(5deg)';
+            });
+
+            previewIcon.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+
+            // Initialisation
+            updatePreview();
+
+            // Animation de l'aperçu au chargement
+            preview.style.opacity = '0';
+            preview.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                preview.style.transition = 'all 0.6s ease';
+                preview.style.opacity = '1';
+                preview.style.transform = 'translateY(0)';
+            }, 300);
+        });
+
+        // Validation du formulaire
+        (function() {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+}

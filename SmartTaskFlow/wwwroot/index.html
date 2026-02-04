@@ -1,0 +1,534 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Admin - Smart Task Flow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3f37c9;
+            --success-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 10px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            min-height: 600px;
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(rgba(67, 97, 238, 0.9), rgba(67, 97, 238, 0.8)), url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo {
+            font-size: 2.5rem;
+            color: white; /* Logo en blanc */
+            margin-right: 15px;
+        }
+
+        .brand h1 {
+            color: white; /* Smart Task Flow en blanc */
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .brand p {
+            color: white; /* "Gestion de tâches intelligente" en blanc */
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .welcome-text {
+            margin-bottom: 3rem;
+        }
+
+            .welcome-text h2 {
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+                color: #f72585; /* "Espace Administrateur" en rose */
+                font-weight: 700;
+            }
+
+            .welcome-text p {
+                color: var(--gray-color);
+                font-size: 1rem;
+            }
+
+        .login-form {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+            .form-input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            }
+
+            .form-input::placeholder {
+                color: #adb5bd;
+            }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+            .login-btn:hover {
+                background-color: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+            }
+
+            .login-btn:active {
+                transform: translateY(0);
+            }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+            border-left: 4px solid #f5c6cb;
+        }
+
+            .error-message.show {
+                display: block;
+            }
+
+            .error-message i {
+                margin-right: 8px;
+            }
+
+        .admin-note {
+            background-color: #e7f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: var(--border-radius);
+        }
+
+            .admin-note h4 {
+                color: var(--primary-color);
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .admin-note p {
+                color: var(--gray-color);
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+        .login-features {
+            margin-top: 3rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.2); /* Fond blanc transparent */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white; /* Icônes en blanc */
+            font-size: 1.3rem;
+        }
+
+        .feature h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: white; /* Titres des features en blanc */
+        }
+
+        .feature p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8); /* Textes des features en blanc légèrement transparent */
+        }
+
+        .footer-text {
+            margin-top: auto;
+            font-size: 0.9rem;
+            color: white; /* Texte du footer en blanc */
+            text-align: center;
+            opacity: 0.8;
+        }
+
+            .footer-text span {
+                color: white; /* Année en blanc */
+                font-weight: 600;
+            }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+
+            .login-left {
+                padding: 2rem;
+                min-height: 300px;
+            }
+
+            .login-right {
+                padding: 2rem;
+            }
+
+            .welcome-text h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .login-left, .login-right {
+                padding: 1.5rem;
+            }
+
+            .brand h1 {
+                font-size: 1.5rem;
+            }
+
+            .welcome-text h2 {
+                font-size: 1.6rem;
+            }
+
+            .feature {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .feature-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Animation pour le bouton de chargement */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+            .loading::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 50%;
+                left: 50%;
+                margin: -10px 0 0 -10px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top: 2px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Section gauche avec informations -->
+        <div class="login-left">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <div>
+                    <h1>Smart Task Flow</h1>
+                    <p>Gestion de tâches intelligente</p>
+                </div>
+            </div>
+
+            <div class="login-features">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h3>Accès Administrateur</h3>
+                        <p>Interface sécurisée pour la gestion complète du système</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h3>Tableau de bord avancé</h3>
+                        <p>Suivi des performances et statistiques détaillées</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div>
+                        <h3>Gestion des utilisateurs</h3>
+                        <p>Contrôle complet des comptes et des permissions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-text">
+                <p>© <span>2026</span> Smart Task Flow. Accès réservé aux administrateurs.</p>
+            </div>
+        </div>
+
+        <!-- Section droite avec formulaire -->
+        <div class="login-right">
+            <div class="welcome-text">
+                <h2>Espace Administrateur</h2>
+                <p>Connectez-vous pour accéder au panneau d'administration</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Adresse email administrateur</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" class="form-input" placeholder="admin@smarttaskflow.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Mot de passe administrateur</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-input" placeholder="Votre mot de passe" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="submitBtn">
+                    <span id="btnText">Connexion Administrateur</span>
+                </button>
+
+                <div class="error-message" id="errorMessage">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText">Email ou mot de passe incorrect</span>
+                </div>
+
+                <div class="admin-note">
+                    <h4><i class="fas fa-info-circle"></i> Accès restreint</h4>
+                    <p>
+                        Cet espace est réservé exclusivement aux administrateurs du système Smart Task Flow.
+                        Seuls les utilisateurs ayant les privilèges d'administration peuvent se connecter.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Afficher l'état de chargement
+            const submitBtn = document.getElementById("submitBtn");
+            const btnText = document.getElementById("btnText");
+            const errorMessage = document.getElementById("errorMessage");
+
+            submitBtn.classList.add("loading");
+            btnText.style.visibility = "hidden";
+            errorMessage.classList.remove("show");
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/api/account/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Identifiants administrateur incorrects");
+                }
+
+                const data = await response.json();
+
+                // Vérifier que l'utilisateur est bien un administrateur
+                if (data.user.role !== "Admin") {
+                    throw new Error("Accès refusé : privilèges administrateur requis");
+                }
+
+                // Sauvegarde JWT + infos utilisateur
+                localStorage.setItem("authToken", data.token);
+                localStorage.setItem("userRole", data.user.role);
+                localStorage.setItem("userName", data.user.name);
+
+                // Redirection vers le dashboard admin
+                window.location.href = "/Frontend/admin-dashboard.html";
+
+            } catch (error) {
+                // Afficher l'erreur
+                document.getElementById("errorText").textContent = error.message;
+                errorMessage.classList.add("show");
+
+                // Réinitialiser le bouton
+                submitBtn.classList.remove("loading");
+                btnText.style.visibility = "visible";
+            }
+        });
+
+        // Animation d'entrée pour les champs de formulaire
+        document.querySelectorAll('.form-input').forEach((input, index) => {
+            input.style.opacity = "0";
+            input.style.transform = "translateY(20px)";
+
+            setTimeout(() => {
+                input.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                input.style.opacity = "1";
+                input.style.transform = "translateY(0)";
+            }, 100 + index * 100);
+        });
+
+        // Focus sur le champ email au chargement
+        document.getElementById("email").focus();
+
+        // Empêcher l'accès aux utilisateurs non-admin
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem("authToken");
+            const role = localStorage.getItem("userRole");
+
+            // Si l'utilisateur est déjà connecté en tant qu'admin, rediriger vers le dashboard
+            if (token && role === "Admin") {
+                window.location.href = "/Frontend/admin-dashboard.html";
+            }
+
+            // Si l'utilisateur est connecté mais n'est pas admin, le déconnecter
+            if (token && role !== "Admin") {
+                localStorage.clear();
+                document.getElementById("errorText").textContent =
+                    "Votre compte ne dispose pas des privilèges administrateur. Veuillez vous reconnecter.";
+                document.getElementById("errorMessage").classList.add("show");
+            }
+        });
+    </script>
+</body>
+</html>

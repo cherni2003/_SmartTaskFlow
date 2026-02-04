@@ -1,0 +1,375 @@
+﻿@model SmartTaskFlow.Models.TaskItem
+
+
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <!-- En-tête -->
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 mb-0">Modifier la tâche</h1>
+                    <p class="text-muted mb-0">ID : @Model.TaskId • Créée le @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Carte principale -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary bg-gradient text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                            <i class="bi bi-pencil-square fs-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="h5 mb-1">Édition de tâche</h2>
+                            <small class="opacity-75">Modifiez les informations ci-dessous</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>Veuillez corriger les erreurs ci-dessous</div>
+                        </div>
+
+                        <input type="hidden" asp-for="TaskId" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedAt" />
+
+                        <!-- Section Informations de base -->
+                        <div class="mb-5">
+                            <h3 class="h6 mb-3 pb-2 border-bottom">
+                                <i class="bi bi-card-text text-primary me-2"></i>Informations de base
+                            </h3>
+
+                            <div class="mb-4">
+                                <label asp-for="Title" class="form-label fw-semibold">
+                                    Titre <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-type-h3 text-muted"></i>
+                                    </span>
+                                    <input asp-for="Title" class="form-control ps-0 border-start-0"
+                                           placeholder="Ex : Préparer la présentation du projet" />
+                                </div>
+                                <span asp-validation-for="Title" class="text-danger small mt-1"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light align-items-start pt-3 border-end-0">
+                                        <i class="bi bi-text-paragraph text-muted"></i>
+                                    </span>
+                                    <textarea asp-for="Description" class="form-control ps-0 border-start-0"
+                                              rows="3" placeholder="Ajoutez des détails sur cette tâche..."></textarea>
+                                </div>
+                                <span asp-validation-for="Description" class="text-danger small mt-1"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="CategoryId" class="form-label fw-semibold">Catégorie</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-tag text-muted"></i>
+                                    </span>
+                                    <select asp-for="CategoryId" class="form-select ps-0 border-start-0"
+                                            asp-items="ViewBag.CategoryId">
+                                        <option value="" class="text-muted">-- Sélectionnez une catégorie --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Planification -->
+                        <div class="mb-5">
+                            <h3 class="h6 mb-3 pb-2 border-bottom">
+                                <i class="bi bi-calendar-check text-primary me-2"></i>Planification
+                            </h3>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="EstimatedDuration" class="form-label fw-semibold">
+                                        Durée estimée <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-clock text-muted"></i>
+                                        </span>
+                                        <input asp-for="EstimatedDuration" type="number"
+                                               class="form-control ps-0 border-start-0" min="5" max="480" />
+                                        <span class="input-group-text bg-light">minutes</span>
+                                    </div>
+                                    <div class="form-text d-flex align-items-center mt-1">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Entre 5 minutes et 8 heures (480 min)
+                                    </div>
+                                    <span asp-validation-for="EstimatedDuration" class="text-danger small d-block mt-1"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="EnergyLevel" class="form-label fw-semibold">
+                                        Énergie requise <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="EnergyLevel" class="form-select energy-select"
+                                            asp-items="ViewBag.EnergyLevels">
+                                        <option value="Low">
+                                            <i class="bi bi-lightning me-1"></i> Faible
+                                        </option>
+                                        <option value="Medium">
+                                            <i class="bi bi-lightning-charge me-1"></i> Moyen
+                                        </option>
+                                        <option value="High">
+                                            <i class="bi bi-lightning-fill me-1"></i> Élevé
+                                        </option>
+                                    </select>
+                                    <span asp-validation-for="EnergyLevel" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <label asp-for="Deadline" class="form-label fw-semibold">Date limite</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar-date text-muted"></i>
+                                    </span>
+                                    <input asp-for="Deadline" type="datetime-local"
+                                           class="form-control ps-0 border-start-0" />
+                                </div>
+                                <span asp-validation-for="Deadline" class="text-danger small mt-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- Section État de la tâche -->
+                        <div class="mb-5">
+                            <h3 class="h6 mb-3 pb-2 border-bottom">
+                                <i class="bi bi-gear text-primary me-2"></i>État de la tâche
+                            </h3>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Priority" class="form-label fw-semibold">
+                                        Priorité <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="Priority" class="form-select priority-select">
+                                        <option value="1" class="text-muted">
+                                            <span class="badge bg-light text-dark rounded-pill">1</span> Très faible
+                                        </option>
+                                        <option value="2" class="text-success">
+                                            <span class="badge bg-success rounded-pill">2</span> Faible
+                                        </option>
+                                        <option value="3" class="text-warning">
+                                            <span class="badge bg-warning rounded-pill">3</span> Moyenne
+                                        </option>
+                                        <option value="4" class="text-orange">
+                                            <span class="badge bg-orange rounded-pill text-white">4</span> Élevée
+                                        </option>
+                                        <option value="5" class="text-danger">
+                                            <span class="badge bg-danger rounded-pill">5</span> Urgent
+                                        </option>
+                                    </select>
+                                    <span asp-validation-for="Priority" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Status" class="form-label fw-semibold">
+                                        Statut <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="Status" class="form-select status-select"
+                                            asp-items="ViewBag.Statuses">
+                                        <option value="ToDo" class="text-secondary">
+                                            <i class="bi bi-circle me-1"></i> À faire
+                                        </option>
+                                        <option value="InProgress" class="text-primary">
+                                            <i class="bi bi-arrow-repeat me-1"></i> En cours
+                                        </option>
+                                        <option value="Completed" class="text-success">
+                                            <i class="bi bi-check-circle me-1"></i> Terminée
+                                        </option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations système -->
+                        <div class="alert alert-light border mt-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-info-circle-fill text-info me-2"></i>
+                                <strong class="me-2">Informations système :</strong>
+                            </div>
+                            <div class="row small">
+                                <div class="col-md-6">
+                                    <div class="mb-1">
+                                        <span class="text-muted">Créée le :</span>
+                                        <strong>@Model.CreatedAt.ToString("dd/MM/yyyy à HH:mm")</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model.CompletedAt.HasValue)
+                                    {
+                                        <div class="mb-1">
+                                            <span class="text-muted">Complétée le :</span>
+                                            <strong class="text-success">@Model.CompletedAt.Value.ToString("dd/MM/yyyy à HH:mm")</strong>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-lg me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style supplémentaire -->
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+        }
+
+    .input-group:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+        border-radius: 8px;
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .input-group-text {
+        border-right: none;
+        background-color: #f8f9fa;
+    }
+
+    .priority-select option {
+        padding: 8px 12px;
+    }
+
+    .energy-select option, .status-select option {
+        padding: 8px 12px;
+    }
+
+    .badge.bg-orange {
+        background-color: #fd7e14 !important;
+    }
+
+    .text-orange {
+        color: #fd7e14 !important;
+    }
+
+    h3.h6 {
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        border: none;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0b5ed7, #0a58ca);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        }
+
+    .btn-outline-secondary {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .alert-light {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .border-bottom {
+        border-bottom: 2px solid #e9ecef !important;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Animation sur soumission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Enregistrement...';
+            submitBtn.disabled = true;
+        });
+
+        // Mise à jour dynamique des couleurs des sélecteurs
+        function updateSelectStyles() {
+            // Priorité
+            const prioritySelect = document.querySelector('.priority-select');
+            const selectedPriority = prioritySelect.options[prioritySelect.selectedIndex];
+            prioritySelect.className = 'form-select priority-select ' + selectedPriority.className.split(' ')[0];
+
+            // Statut
+            const statusSelect = document.querySelector('.status-select');
+            const selectedStatus = statusSelect.options[statusSelect.selectedIndex];
+            statusSelect.className = 'form-select status-select ' + selectedStatus.className.split(' ')[0];
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSelectStyles();
+
+            // Écouteurs de changement
+            document.querySelector('.priority-select').addEventListener('change', updateSelectStyles);
+            document.querySelector('.status-select').addEventListener('change', updateSelectStyles);
+
+            // Validation Bootstrap
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        });
+    </script>
+}

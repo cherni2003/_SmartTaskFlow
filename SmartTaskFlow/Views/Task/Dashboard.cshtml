@@ -1,0 +1,554 @@
+﻿@model dynamic
+@{
+    var completionRate = Model.TotalTasks > 0 ? (int)((double)Model.CompletedTasks / Model.TotalTasks * 100) : 0;
+    var overdueTasks = ((IEnumerable<SmartTaskFlow.Models.TaskItem>)Model.Tasks)
+        .Where(t => t.IsOverdue)
+        .OrderBy(t => t.Deadline)
+        .ToList();
+    var upcomingTasks = ((IEnumerable<SmartTaskFlow.Models.TaskItem>)Model.Tasks)
+        .Where(t => t.Status != "Completed" && !t.IsOverdue && t.Deadline.HasValue)
+        .OrderBy(t => t.Deadline)
+        .Take(5)
+        .ToList();
+    var recentCompleted = ((IEnumerable<SmartTaskFlow.Models.TaskItem>)Model.Tasks)
+        .Where(t => t.Status == "Completed")
+        .OrderByDescending(t => t.CompletedAt)
+        .Take(5)
+        .ToList();
+}
+
+<style>
+    /* Animations et styles personnalisés */
+    .stat-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 1.5s ease-in-out;
+    }
+
+    .task-badge {
+        font-size: 0.75em;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .priority-5 {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .priority-4 {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    .priority-3 {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .priority-2 {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .priority-1 {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .energy-low {
+        color: #6f42c1;
+    }
+
+    .energy-medium {
+        color: #0dcaf0;
+    }
+
+    .energy-high {
+        color: #198754;
+    }
+
+    .category-icon {
+        font-size: 1.2em;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        margin-right: 10px;
+    }
+
+    .task-item {
+        border-left: 4px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+        .task-item:hover {
+            border-left: 4px solid #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <h1 class="display-6 fw-bold text-primary mb-2">📊 Tableau de bord</h1>
+            <p class="text-muted mb-0">Vue d'ensemble de votre productivité</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a asp-action="Index" class="btn btn-outline-primary me-2">
+                <i class="bi bi-list-task"></i> Liste des tâches
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nouvelle tâche
+            </a>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card h-100">
+                <div class="card border-0 h-100" style="background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);">
+                    <div class="card-body text-white d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle p-3" style="background: rgba(255,255,255,0.2);">
+                                <i class="bi bi-list-check" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 opacity-75">TOTAL DES TÂCHES</h6>
+                            <h2 class="fw-bold mb-0">@Model.TotalTasks</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card h-100">
+                <div class="card border-0 h-100" style="background: linear-gradient(135deg, #198754 0%, #157347 100%);">
+                    <div class="card-body text-white d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle p-3" style="background: rgba(255,255,255,0.2);">
+                                <i class="bi bi-check-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 opacity-75">COMPLÉTÉES</h6>
+                            <h2 class="fw-bold mb-0">@Model.CompletedTasks</h2>
+                            <small class="opacity-75">@completionRate% de réussite</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card h-100">
+                <div class="card border-0 h-100" style="background: linear-gradient(135deg, #0dcaf0 0%, #0baccc 100%);">
+                    <div class="card-body text-white d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle p-3" style="background: rgba(255,255,255,0.2);">
+                                <i class="bi bi-arrow-repeat" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 opacity-75">EN COURS</h6>
+                            <h2 class="fw-bold mb-0">@Model.InProgressTasks</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card h-100">
+                <div class="card border-0 h-100" style="background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);">
+                    <div class="card-body text-white d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle p-3" style="background: rgba(255,255,255,0.2);">
+                                <i class="bi bi-exclamation-triangle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-1 opacity-75">EN RETARD</h6>
+                            <h2 class="fw-bold mb-0">@Model.OverdueTasks</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progression et répartition -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">📈 Progression globale</h5>
+                    <span class="badge bg-primary">@completionRate%</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Taux d'accomplissement</span>
+                            <span class="fw-bold">@completionRate%</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: @completionRate%;"
+                                 aria-valuenow="@completionRate" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted">@Model.CompletedTasks complétées</small>
+                            <small class="text-muted">@Model.TotalTasks total</small>
+                        </div>
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="p-3">
+                                <div class="h3 fw-bold text-secondary">@Model.PendingTasks</div>
+                                <div class="text-muted">À faire</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3">
+                                <div class="h3 fw-bold text-info">@Model.InProgressTasks</div>
+                                <div class="text-muted">En cours</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3">
+                                <div class="h3 fw-bold text-success">@Model.CompletedTasks</div>
+                                <div class="text-muted">Terminées</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-bold">📊 Répartition par statut</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tâches d'aujourd'hui -->
+    <div class="card stat-card mb-4">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-calendar-day text-primary me-2"></i>
+                Tâches d'aujourd'hui
+            </h5>
+            <span class="badge bg-primary rounded-pill">@Model.TodayTasks</span>
+        </div>
+        <div class="card-body">
+            @if (Model.TodayTasks > 0)
+            {
+                <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <i class="bi bi-alarm me-2" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>Attention !</strong> Vous avez @Model.TodayTasks tâche(s) à terminer aujourd'hui.
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-emoji-smile"></i>
+                    <h5 class="text-muted">Aucune tâche aujourd'hui</h5>
+                    <p class="text-muted">Profitez-en pour planifier vos prochaines tâches !</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Tâches en retard -->
+    @if (overdueTasks.Any())
+    {
+        <div class="card stat-card border-danger mb-4">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Tâches en retard
+                </h5>
+                <span class="badge bg-light text-danger rounded-pill">@overdueTasks.Count</span>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    @foreach (var task in overdueTasks.Take(5))
+                    {
+                        <a asp-action="Details" asp-route-id="@task.TaskId"
+                           class="list-group-item list-group-item-action border-0 py-3 task-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="d-flex align-items-start">
+                                    <span class="category-icon bg-danger bg-opacity-10 text-danger">
+                                        @(task.Category?.Icon ?? "📌")
+                                    </span>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">@task.Title</h6>
+                                        <p class="mb-1 text-muted small">
+                                            <i class="bi bi-clock me-1"></i>@task.FormattedDuration
+                                            <span class="mx-2">•</span>
+                                            <i class="bi bi-lightning-charge me-1 energy-@task.EnergyLevel.ToLower()"></i>@task.EnergyLevelFrench
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge priority-@task.Priority mb-2">@task.PriorityBadge</span>
+                                    <div>
+                                        <small class="text-danger fw-bold">
+                                            <i class="bi bi-calendar-x"></i>
+                                            @task.Deadline?.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+                @if (overdueTasks.Count > 5)
+                {
+                    <div class="text-center mt-3">
+                        <a asp-action="Index" class="btn btn-outline-danger">
+                            <i class="bi bi-eye me-1"></i>
+                            Voir toutes (@overdueTasks.Count)
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Tâches à venir -->
+    @if (upcomingTasks.Any())
+    {
+        <div class="card stat-card mb-4">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-calendar-week text-info me-2"></i>
+                    Prochaines tâches
+                </h5>
+                <a asp-action="Index" class="btn btn-sm btn-outline-info">Voir toutes</a>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    @foreach (var task in upcomingTasks)
+                    {
+                        <a asp-action="Details" asp-route-id="@task.TaskId"
+                           class="list-group-item list-group-item-action border-0 py-3 task-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="d-flex align-items-start">
+                                    <span class="category-icon bg-info bg-opacity-10 text-info">
+                                        @(task.Category?.Icon ?? "📌")
+                                    </span>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">@task.Title</h6>
+                                        <p class="mb-1 text-muted small">
+                                            <i class="bi bi-clock me-1"></i>@task.FormattedDuration
+                                            <span class="mx-2">•</span>
+                                            <i class="bi bi-lightning-charge me-1 energy-@task.EnergyLevel.ToLower()"></i>@task.EnergyLevelFrench
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge priority-@task.Priority mb-2">@task.PriorityBadge</span>
+                                    <div>
+                                        <small class="text-primary">
+                                            <i class="bi bi-calendar-check"></i>
+                                            @task.Deadline?.ToString("dd/MM/yyyy")
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">@task.Deadline?.ToString("HH:mm")</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Tâches récemment complétées -->
+    @if (recentCompleted.Any())
+    {
+        <div class="card stat-card mb-4">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-trophy text-success me-2"></i>
+                    Récemment complétées
+                </h5>
+                <a asp-action="Index" asp-route-status="Completed" class="btn btn-sm btn-outline-success">Historique</a>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    @foreach (var task in recentCompleted)
+                    {
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="d-flex align-items-start">
+                                    <span class="category-icon bg-success bg-opacity-10 text-success">
+                                        @(task.Category?.Icon ?? "📌")
+                                    </span>
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <span class="text-success me-2">✅</span>
+                                            @task.Title
+                                        </h6>
+                                        <p class="mb-1 text-muted small">@task.Description</p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-check"></i>
+                                        Complétée le<br>
+                                        @task.CompletedAt?.ToString("dd/MM/yyyy")
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Graphique circulaire
+            const ctx = document.getElementById('statusChart');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['À faire', 'En cours', 'Terminées'],
+                    datasets: [{
+                        data: [@Model.PendingTasks, @Model.InProgressTasks, @Model.CompletedTasks],
+                        backgroundColor: [
+                            'rgba(108, 117, 125, 0.8)',
+                            'rgba(13, 202, 240, 0.8)',
+                            'rgba(25, 135, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(108, 117, 125)',
+                            'rgb(13, 202, 240)',
+                            'rgb(25, 135, 84)'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    label += value + ' (' + percentage + '%)';
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // Animation des cartes au chargement
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animation de la barre de progression
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = '@completionRate%';
+                }, 500);
+            }
+        });
+    </script>
+}

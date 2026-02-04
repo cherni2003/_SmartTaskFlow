@@ -1,0 +1,929 @@
+﻿@{
+    ViewData["Title"] = "SmartTaskFlow - Gestion Intelligente des Tâches";
+    ViewData["Subtitle"] = "Organisez vos tâches selon votre énergie, votre temps et vos priorités réelles";
+}
+
+<!-- Hero Section -->
+<section class="hero-section py-5 py-lg-6 position-relative overflow-hidden">
+    <div class="container position-relative z-2">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="hero-content pe-lg-4">
+                    <div class="badge bg-gradient-primary bg-opacity-10 text-primary rounded-pill px-4 py-2 mb-4 d-inline-flex align-items-center animate-fade-in">
+                        <i class="bi bi-stars me-2"></i>
+                        <span class="fw-semibold">Révolutionnez votre productivité</span>
+                    </div>
+
+                    <h1 class="display-4 fw-bold mb-4 animate-slide-up">
+                        Gestion <span class="text-gradient-primary">intelligente</span> de vos tâches quotidiennes
+                    </h1>
+
+                    <p class="lead text-muted mb-5 animate-slide-up" style="animation-delay: 0.1s;">
+                        SmartTaskFlow analyse votre énergie, votre temps disponible et vos priorités pour vous suggérer la meilleure tâche à accomplir en ce moment.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 animate-slide-up" style="animation-delay: 0.2s;">
+                        <a asp-controller="Account" asp-action="Signup" class="btn btn-primary btn-lg px-4 px-md-5 py-3 shadow-sm-hover">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Commencer gratuitement
+                        </a>
+                        <a asp-controller="Task" asp-action="SmartSuggestion" class="btn btn-outline-primary btn-lg px-4 px-md-5 py-3">
+                            <i class="bi bi-robot me-2"></i>Essayer le mode intelligent
+                        </a>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div class="mt-5 pt-3 animate-fade-in" style="animation-delay: 0.3s;">
+                        <p class="text-muted small mb-3">Rejoignez notre communauté de productivité</p>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-group me-3">
+                                <div class="avatar avatar-sm" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=1')"></div>
+                                <div class="avatar avatar-sm" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=2')"></div>
+                                <div class="avatar avatar-sm" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=3')"></div>
+                                <div class="avatar avatar-sm" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=4')"></div>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-semibold">10,000+ utilisateurs</p>
+                                <p class="text-muted small mb-0">Augmentent leur productivité</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-visual position-relative animate-float">
+                    <div class="dashboard-preview card border-0 shadow-xl rounded-4 overflow-hidden">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="dashboard-icon bg-gradient-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i class="bi bi-speedometer2 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Tableau de bord SmartTaskFlow</h6>
+                                    <small class="text-muted">Suggestions en temps réel</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                <i class="bi bi-circle-fill me-1"></i>En ligne
+                            </span>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <!-- Stats Overview -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="stat-card p-3 rounded-3 bg-primary bg-opacity-5 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stat-icon bg-gradient-primary rounded-circle p-2 me-3">
+                                                <i class="bi bi-check-circle-fill text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold" data-count="12">0</h4>
+                                                <small class="text-muted">Tâches complétées</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card p-3 rounded-3 bg-warning bg-opacity-5 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stat-icon bg-gradient-warning rounded-circle p-2 me-3">
+                                                <i class="bi bi-clock-fill text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold" data-count="3">0</h4>
+                                                <small class="text-muted">En attente</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Smart Suggestion -->
+                            <div class="smart-suggestion p-4 rounded-4 bg-gradient-primary bg-opacity-10 border-start border-primary border-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+                                            <h6 class="mb-0 fw-bold">Suggestion intelligente</h6>
+                                        </div>
+                                        <p class="small text-muted mb-0">Basée sur votre énergie et disponibilité actuelles</p>
+                                    </div>
+                                    <span class="badge bg-primary bg-opacity-25 text-primary px-3 py-2">
+                                        <i class="bi bi-clock me-1"></i>30 min
+                                    </span>
+                                </div>
+
+                                <div class="task-preview p-3 bg-white rounded-3 shadow-sm mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="task-check me-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="taskCheck">
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-semibold">Rédiger le rapport trimestriel</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                                    <i class="bi bi-battery-full me-1"></i>Énergie: Élevée
+                                                </span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                                    <i class="bi bi-flag-fill me-1"></i>Priorité: Haute
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-check me-1"></i>Déadline: Aujourd'hui
+                                    </small>
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="bi bi-play-fill me-1"></i>Commencer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="floating-element floating-1 bg-gradient-warning rounded-circle position-absolute"></div>
+                    <div class="floating-element floating-2 bg-gradient-primary rounded-circle position-absolute"></div>
+                    <div class="floating-element floating-3 bg-gradient-info rounded-circle position-absolute"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="hero-bg-gradient"></div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 py-lg-6 position-relative overflow-hidden">
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center mb-5 mb-lg-6">
+            <div class="col-lg-8 text-center">
+                <div class="section-header animate-fade-in">
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3">
+                        <i class="bi bi-gear-wide-connected me-2"></i>Fonctionnalités
+                    </span>
+                    <h2 class="display-5 fw-bold mb-3 animate-slide-up">Comment ça fonctionne ?</h2>
+                    <p class="lead text-muted animate-slide-up" style="animation-delay: 0.1s;">
+                        Notre système intelligent analyse plusieurs facteurs pour optimiser votre productivité en temps réel
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 g-lg-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card card border-0 shadow-sm h-100 overflow-hidden animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="card-body p-4">
+                        <div class="feature-icon-wrapper mb-4">
+                            <div class="feature-icon bg-gradient-primary bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center p-3">
+                                <i class="bi bi-battery-full text-primary fs-2"></i>
+                            </div>
+                            <span class="feature-badge bg-primary text-white rounded-circle">1</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Niveau d'énergie</h5>
+                        <p class="card-text text-muted mb-0">
+                            Indiquez votre énergie du moment pour recevoir des tâches adaptées à votre capacité cognitive.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <small class="text-primary fw-medium d-flex align-items-center">
+                            <i class="bi bi-arrow-right me-1"></i>Adaptatif
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card card border-0 shadow-sm h-100 overflow-hidden animate-slide-up" style="animation-delay: 0.3s;">
+                    <div class="card-body p-4">
+                        <div class="feature-icon-wrapper mb-4">
+                            <div class="feature-icon bg-gradient-success bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center p-3">
+                                <i class="bi bi-clock-history text-success fs-2"></i>
+                            </div>
+                            <span class="feature-badge bg-success text-white rounded-circle">2</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Temps disponible</h5>
+                        <p class="card-text text-muted mb-0">
+                            Spécifiez votre créneau disponible pour des suggestions parfaitement calibrées.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <small class="text-success fw-medium d-flex align-items-center">
+                            <i class="bi bi-arrow-right me-1"></i>Efficace
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card card border-0 shadow-sm h-100 overflow-hidden animate-slide-up" style="animation-delay: 0.4s;">
+                    <div class="card-body p-4">
+                        <div class="feature-icon-wrapper mb-4">
+                            <div class="feature-icon bg-gradient-warning bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center p-3">
+                                <i class="bi bi-flag-fill text-warning fs-2"></i>
+                            </div>
+                            <span class="feature-badge bg-warning text-white rounded-circle">3</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Priorités réelles</h5>
+                        <p class="card-text text-muted mb-0">
+                            Hiérarchisez vos tâches selon l'impact réel plutôt que les deadlines artificielles.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <small class="text-warning fw-medium d-flex align-items-center">
+                            <i class="bi bi-arrow-right me-1"></i>Stratégique
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card card border-0 shadow-sm h-100 overflow-hidden animate-slide-up" style="animation-delay: 0.5s;">
+                    <div class="card-body p-4">
+                        <div class="feature-icon-wrapper mb-4">
+                            <div class="feature-icon bg-gradient-info bg-opacity-10 rounded-3 d-inline-flex align-items-center justify-content-center p-3">
+                                <i class="bi bi-robot text-info fs-2"></i>
+                            </div>
+                            <span class="feature-badge bg-info text-white rounded-circle">4</span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Intelligence Artificielle</h5>
+                        <p class="card-text text-muted mb-0">
+                            Notre algorithme apprend de vos habitudes pour des suggestions toujours plus pertinentes.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <small class="text-info fw-medium d-flex align-items-center">
+                            <i class="bi bi-arrow-right me-1"></i>Intelligent
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Pattern -->
+    <div class="features-pattern"></div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5 py-lg-6 bg-dark text-white position-relative overflow-hidden">
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center mb-5 mb-lg-6">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-5 fw-bold mb-3">Des résultats concrets</h2>
+                <p class="lead opacity-75">Rejoignez les milliers d'utilisateurs qui ont transformé leur productivité</p>
+            </div>
+        </div>
+
+        <div class="row g-4 g-lg-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card text-center p-4 rounded-4 bg-dark bg-opacity-50 border border-white border-opacity-10">
+                    <div class="stat-icon-wrapper mb-4">
+                        <div class="stat-icon-circle bg-primary bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-3">
+                            <i class="bi bi-heart-fill text-primary fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="display-4 fw-bold mb-2">
+                        <span class="counter" data-count="98">0</span>%
+                    </h3>
+                    <p class="opacity-75 mb-0">Taux de satisfaction</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card text-center p-4 rounded-4 bg-dark bg-opacity-50 border border-white border-opacity-10">
+                    <div class="stat-icon-wrapper mb-4">
+                        <div class="stat-icon-circle bg-success bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-3">
+                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="display-4 fw-bold mb-2">
+                        <span class="counter" data-count="10000" data-suffix="K+">0</span>
+                    </h3>
+                    <p class="opacity-75 mb-0">Tâches optimisées</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card text-center p-4 rounded-4 bg-dark bg-opacity-50 border border-white border-opacity-10">
+                    <div class="stat-icon-wrapper mb-4">
+                        <div class="stat-icon-circle bg-warning bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-3">
+                            <i class="bi bi-graph-up-arrow text-warning fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="display-4 fw-bold mb-2">
+                        <span class="counter" data-count="45">0</span>%
+                    </h3>
+                    <p class="opacity-75 mb-0">Productivité augmentée</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card text-center p-4 rounded-4 bg-dark bg-opacity-50 border border-white border-opacity-10">
+                    <div class="stat-icon-wrapper mb-4">
+                        <div class="stat-icon-circle bg-info bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-3">
+                            <i class="bi bi-headset text-info fs-3"></i>
+                        </div>
+                    </div>
+                    <h3 class="display-4 fw-bold mb-2">24/7</h3>
+                    <p class="opacity-75 mb-0">Support disponible</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="stats-gradient"></div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5 py-lg-6 position-relative overflow-hidden">
+    <div class="container position-relative z-2">
+        <div class="cta-card bg-gradient-primary text-white rounded-4 p-4 p-lg-5 shadow-xl position-relative overflow-hidden">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="display-6 fw-bold mb-3">Prêt à révolutionner votre productivité ?</h2>
+                    <p class="lead opacity-90 mb-4">
+                        Rejoignez des milliers de professionnels qui optimisent déjà leur gestion des tâches avec SmartTaskFlow.
+                        Commencez gratuitement dès aujourd'hui.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a asp-controller="Account" asp-action="Signup" class="btn btn-light btn-lg px-4 px-md-5 py-3 fw-bold shadow-sm-hover">
+                            <i class="bi bi-person-plus me-2"></i>S'inscrire gratuitement
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4 px-md-5 py-3">
+                            <i class="bi bi-play-circle me-2"></i>Voir la démo
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                    <div class="cta-illustration position-relative">
+                        <i class="bi bi-rocket-takeoff text-white opacity-25" style="font-size: 8rem;"></i>
+                        <div class="pulse-ring pulse-ring-1"></div>
+                        <div class="pulse-ring pulse-ring-2"></div>
+                        <div class="pulse-ring pulse-ring-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Icons -->
+            <div class="floating-icon floating-icon-1">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div class="floating-icon floating-icon-2">
+                <i class="bi bi-clock-fill"></i>
+            </div>
+            <div class="floating-icon floating-icon-3">
+                <i class="bi bi-star-fill"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Variables CSS */
+    :root {
+        --primary-color: #4361ee;
+        --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        --success-gradient: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%);
+        --warning-gradient: linear-gradient(135deg, #ffd166 0%, #ef476f 100%);
+        --info-gradient: linear-gradient(135deg, #118ab2 0%, #073b4c 100%);
+    }
+
+    /* Animations */
+    .animate-fade-in {
+        opacity: 0;
+        animation: fadeIn 0.8s ease forwards;
+    }
+
+    .animate-slide-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: slideUp 0.8s ease forwards;
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @@keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+    }
+
+    @@keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    }
+
+    .hero-bg-gradient {
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 60%;
+        height: 200%;
+        background: var(--primary-gradient);
+        opacity: 0.03;
+        border-radius: 50%;
+        filter: blur(100px);
+        z-index: 1;
+    }
+
+    .text-gradient-primary {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Dashboard Preview */
+    .dashboard-preview {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+        .dashboard-preview:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(67, 97, 238, 0.15) !important;
+            border-color: rgba(67, 97, 238, 0.2);
+        }
+
+    .bg-gradient-primary {
+        background: var(--primary-gradient) !important;
+    }
+
+    .bg-gradient-success {
+        background: var(--success-gradient) !important;
+    }
+
+    .bg-gradient-warning {
+        background: var(--warning-gradient) !important;
+    }
+
+    .bg-gradient-info {
+        background: var(--info-gradient) !important;
+    }
+
+    /* Floating Elements */
+    .floating-element {
+        width: 60px;
+        height: 60px;
+        opacity: 0.1;
+        filter: blur(20px);
+        z-index: 1;
+    }
+
+    .floating-1 {
+        top: -30px;
+        right: 20%;
+        animation: float 8s ease-in-out infinite;
+    }
+
+    .floating-2 {
+        bottom: 30px;
+        left: 10%;
+        animation: float 10s ease-in-out infinite 1s;
+    }
+
+    .floating-3 {
+        top: 40%;
+        right: 10%;
+        animation: float 12s ease-in-out infinite 2s;
+    }
+
+    /* Avatar Group */
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        border: 2px solid white;
+    }
+
+    .avatar-group .avatar {
+        margin-right: -12px;
+    }
+
+        .avatar-group .avatar:last-child {
+            margin-right: 0;
+        }
+
+    /* Feature Cards */
+    .feature-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #eef2ff;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(67, 97, 238, 0.12) !important;
+            border-color: #4361ee;
+        }
+
+    .feature-icon-wrapper {
+        position: relative;
+    }
+
+    .feature-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-icon {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .stats-gradient {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(67, 97, 238, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(6, 214, 160, 0.1) 0%, transparent 50%);
+        z-index: 1;
+    }
+
+    .stat-card {
+        transition: all 0.4s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+        }
+
+    .stat-icon-circle {
+        transition: all 0.4s ease;
+    }
+
+    .stat-card:hover .stat-icon-circle {
+        transform: scale(1.1) rotate(10deg);
+    }
+
+    /* CTA Section */
+    .cta-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            animation: spin 20s linear infinite;
+        }
+
+    .pulse-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        height: 100px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .pulse-ring-2 {
+        animation-delay: 0.5s;
+        width: 130px;
+        height: 130px;
+    }
+
+    .pulse-ring-3 {
+        animation-delay: 1s;
+        width: 160px;
+        height: 160px;
+    }
+
+    .floating-icon {
+        position: absolute;
+        color: rgba(255, 255, 255, 0.2);
+        font-size: 1.5rem;
+        animation: float 10s ease-in-out infinite;
+    }
+
+    .floating-icon-1 {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .floating-icon-2 {
+        top: 60%;
+        right: 15%;
+        animation-delay: 2s;
+    }
+
+    .floating-icon-3 {
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    /* Buttons */
+    .btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+    .shadow-sm-hover {
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2) !important;
+    }
+
+        .shadow-sm-hover:hover {
+            box-shadow: 0 8px 24px rgba(67, 97, 238, 0.3) !important;
+        }
+
+    .shadow-xl {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Smart Suggestion */
+    .smart-suggestion {
+        transition: all 0.3s ease;
+    }
+
+        .smart-suggestion:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.15);
+        }
+
+    /* Features Pattern */
+    .features-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.03) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(6, 214, 160, 0.03) 0%, transparent 20%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* Responsive */
+    .rounded-3 {
+        border-radius: 12px !important;
+    }
+
+    .rounded-4 {
+        border-radius: 20px !important;
+    }
+
+    .display-4 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    .display-5 {
+        font-size: clamp(2rem, 4vw, 2.5rem);
+    }
+
+    .display-6 {
+        font-size: clamp(1.75rem, 3vw, 2rem);
+    }
+
+    .lead {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+    }
+
+    /* Section Spacing */
+    .py-lg-6 {
+        padding-top: 4rem !important;
+        padding-bottom: 4rem !important;
+    }
+
+    @@media (min-width: 992px) {
+        .py-lg-6 {
+            padding-top: 6rem !important;
+            padding-bottom: 6rem !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Counter Animation
+        function animateCounter(element, target, duration = 1500) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // Animate all counters
+        const counters = document.querySelectorAll('.counter[data-count]');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const target = parseInt(element.getAttribute('data-count'));
+                    const suffix = element.getAttribute('data-suffix') || '';
+
+                    animateCounter(element, target, 1500);
+
+                    if (suffix) {
+                        setTimeout(() => {
+                            element.textContent = (target/1000) + suffix;
+                        }, 1600);
+                    }
+
+                    observer.unobserve(element);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => observer.observe(counter));
+
+        // Animate dashboard stats
+        const dashboardStats = document.querySelectorAll('.stat-card h4[data-count]');
+        dashboardStats.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-count'));
+            if (target > 0) {
+                setTimeout(() => {
+                    animateCounter(stat, target, 800);
+                }, 1000);
+            }
+        });
+
+        // Staggered animation for feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1 + 0.2}s`;
+        });
+
+        // Interactive task checkbox
+        const taskCheckbox = document.getElementById('taskCheck');
+        if (taskCheckbox) {
+            taskCheckbox.addEventListener('change', function() {
+                const taskPreview = this.closest('.task-preview');
+                if (this.checked) {
+                    taskPreview.style.opacity = '0.7';
+                    taskPreview.style.transform = 'scale(0.98)';
+                    taskPreview.style.textDecoration = 'line-through';
+                } else {
+                    taskPreview.style.opacity = '1';
+                    taskPreview.style.transform = 'scale(1)';
+                    taskPreview.style.textDecoration = 'none';
+                }
+            });
+        }
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-section');
+            if (hero) {
+                hero.style.backgroundPositionY = scrolled * 0.5 + 'px';
+            }
+        });
+
+        // Add hover sound effect simulation
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(1px)';
+            });
+
+            button.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+        });
+
+        // Auto-rotate floating elements
+        setInterval(() => {
+            const floatingElements = document.querySelectorAll('.floating-element');
+            floatingElements.forEach(el => {
+                const currentRotation = parseFloat(getComputedStyle(el).transform.split(',')[0]?.replace('matrix(', '') || 0);
+                el.style.transform = `rotate(${currentRotation + 0.5}deg)`;
+            });
+        }, 50);
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,589 @@
+﻿@model SmartTaskFlow.Models.Category
+
+@{
+    ViewData["Title"] = "Détails de la catégorie";
+    ViewData["Subtitle"] = "Vue détaillée et statistiques";
+    var completedTasks = Model.Tasks.Count(t => t.Status == "Completed");
+    var inProgressTasks = Model.Tasks.Count(t => t.Status == "InProgress");
+    var todoTasks = Model.Tasks.Count(t => t.Status == "ToDo");
+    var totalTasks = Model.Tasks.Count;
+    var completionRate = totalTasks > 0 ? (int)((double)completedTasks / totalTasks * 100) : 0;
+}
+
+<div class="container py-4 py-lg-5">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-5 animate-slide-up">
+        <div>
+            <div class="badge bg-gradient-info bg-opacity-10 text-info rounded-pill px-4 py-2 mb-3 d-inline-flex align-items-center">
+                <i class="bi bi-eye me-2"></i>
+                <span class="fw-semibold">Vue détaillée</span>
+            </div>
+            <h1 class="display-5 fw-bold mb-0">🏷️ @Model.CategoryName</h1>
+            <p class="text-muted mb-0">Détails et statistiques de la catégorie</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4 py-3">
+            <i class="bi bi-arrow-left me-2"></i>Retour
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Carte principale de la catégorie -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-xl rounded-4 overflow-hidden animate-slide-up" style="animation-delay: 0.1s">
+                <div class="card-header bg-gradient-primary text-white border-0 py-4 px-5">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="category-main-icon bg-white bg-opacity-20 rounded-circle d-inline-flex align-items-center justify-content-center p-3 me-3">
+                                <span style="font-size: 1.5rem;">@(Model.Icon ?? "📁")</span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Catégorie</h5>
+                                <small class="opacity-75">Informations principales</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-white bg-opacity-20 text-white py-2 px-3">
+                            @totalTasks tâche@(totalTasks > 1 ? "s" : "")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <!-- Icône et nom -->
+                    <div class="text-center mb-5">
+                        <div class="category-preview-icon mb-4"
+                             style="background: linear-gradient(135deg, @(Model.ColorCode ?? "#4361ee") 0%, darken(@(Model.ColorCode ?? "#4361ee"), 20%) 100%);">
+                            <span>@(Model.Icon ?? "📁")</span>
+                        </div>
+                        <h3 class="fw-bold mb-2">@Model.CategoryName</h3>
+                        <p class="text-muted">Organisez vos tâches efficacement</p>
+                    </div>
+
+                    <!-- Informations détaillées -->
+                    <div class="category-info mb-5">
+                        <div class="info-item d-flex align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div class="info-icon bg-gradient-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-2 me-3">
+                                <i class="bi bi-palette text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <small class="text-muted d-block">Couleur</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="color-dot me-2" style="background-color: @(Model.ColorCode ?? "#4361ee")"></div>
+                                    <span class="fw-semibold">@(Model.ColorCode ?? "Par défaut")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-item d-flex align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div class="info-icon bg-gradient-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-2 me-3">
+                                <i class="bi bi-emoji-smile text-warning"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Icône</small>
+                                <span class="fw-semibold">@(Model.Icon ?? "Non définie")</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item d-flex align-items-center p-3 rounded-3 bg-light">
+                            <div class="info-icon bg-gradient-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-2 me-3">
+                                <i class="bi bi-123 text-success"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Identifiant</small>
+                                <span class="fw-semibold">#@Model.CategoryId</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-3">
+                        <a asp-action="Edit" asp-route-id="@Model.CategoryId"
+                           class="btn btn-warning btn-lg py-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Modifier la catégorie
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.CategoryId"
+                           class="btn btn-outline-danger btn-lg py-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-trash me-2"></i>
+                            Supprimer la catégorie
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-lg-8">
+            <!-- Statistiques -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 animate-slide-up" style="animation-delay: 0.2s">
+                    <div class="stat-card card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="stat-icon bg-gradient-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                                <i class="bi bi-list-check text-primary fs-3"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold mb-2" id="totalTasks">@totalTasks</h3>
+                            <p class="text-muted mb-0">Total des tâches</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 animate-slide-up" style="animation-delay: 0.3s">
+                    <div class="stat-card card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="stat-icon bg-gradient-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                                <i class="bi bi-check-circle text-success fs-3"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold mb-2" id="completedTasks">@completedTasks</h3>
+                            <p class="text-muted mb-0">Complétées</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 animate-slide-up" style="animation-delay: 0.4s">
+                    <div class="stat-card card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="stat-icon bg-gradient-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                                <i class="bi bi-clock text-warning fs-3"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold mb-2" id="todoTasks">@todoTasks</h3>
+                            <p class="text-muted mb-0">À faire</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barre de progression -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 animate-slide-up" style="animation-delay: 0.5s">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">📈 Progression globale</h5>
+                            <p class="text-muted mb-0">@completedTasks tâches complétées sur @totalTasks</p>
+                        </div>
+                        <span class="badge bg-gradient-success bg-opacity-10 text-success border border-success border-opacity-25 py-2 px-3">
+                            @completionRate%
+                        </span>
+                    </div>
+                    <div class="progress-wrapper">
+                        <div class="progress" style="height: 16px; border-radius: 10px;">
+                            <div class="progress-bar bg-gradient-success"
+                                 role="progressbar"
+                                 style="width: @completionRate%"
+                                 aria-valuenow="@completionRate"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 id="progressBar">
+                                <span class="progress-text">@completionRate%</span>
+                            </div>
+                        </div>
+                        <div class="progress-labels d-flex justify-content-between mt-2">
+                            <small class="text-muted">0%</small>
+                            <small class="text-muted">100%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique de répartition -->
+            @if (Model.Tasks.Any())
+            {
+                <div class="card border-0 shadow-sm rounded-4 mb-4 animate-slide-up" style="animation-delay: 0.6s">
+                    <div class="card-header bg-white border-0 py-4 px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="chart-icon bg-gradient-info bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-pie-chart-fill text-info"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">📊 Répartition des tâches</h5>
+                                <small class="text-muted">Statut des tâches par catégorie</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <canvas id="categoryTasksChart" height="150"></canvas>
+                    </div>
+                </div>
+            }
+
+            <!-- Liste des tâches -->
+            <div class="card border-0 shadow-sm rounded-4 animate-slide-up" style="animation-delay: 0.7s">
+                <div class="card-header bg-white border-0 py-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="list-icon bg-gradient-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-check2-square text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">📋 Tâches de cette catégorie</h5>
+                                <small class="text-muted">@Model.Tasks.Count tâche@(Model.Tasks.Count > 1 ? "s" : "")</small>
+                            </div>
+                        </div>
+                        <a asp-controller="Task" asp-action="Create" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Nouvelle tâche
+                        </a>
+                    </div>
+                </div>
+
+                @if (!Model.Tasks.Any())
+                {
+                    <div class="card-body text-center py-6">
+                        <div class="empty-state-icon bg-gradient-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-4">
+                            <i class="bi bi-check2-square text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Aucune tâche dans cette catégorie</h5>
+                        <p class="text-muted mb-4">Commencez par créer une tâche avec cette catégorie !</p>
+                        <a asp-controller="Task" asp-action="Create" class="btn btn-primary btn-lg px-5 py-3">
+                            <i class="bi bi-plus-circle me-2"></i>Créer une tâche
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @foreach (var task in Model.Tasks.OrderByDescending(t => t.CreatedAt))
+                            {
+                                <a asp-controller="Task" asp-action="Details" asp-route-id="@task.TaskId"
+                                   class="list-group-item list-group-item-action border-0 py-4 px-4 transition-all">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex align-items-start">
+                                            <div class="task-check me-3">
+                                                <div class="form-check form-check-lg">
+                                                    <input class="form-check-input" type="checkbox" @(task.Status == "Completed" ? "checked" : "") disabled>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h6 class="mb-0 fw-semibold me-3 @(task.Status == "Completed" ? "text-muted text-decoration-line-through" : "")">
+                                                        @(task.IsOverdue ? "⚠️ " : "")@task.Title
+                                                    </h6>
+                                                    <span class="badge @(task.Status == "Completed" ? "bg-success bg-opacity-10 text-success border border-success border-opacity-25" :
+                                                                                                                               task.Status == "InProgress" ? "bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" :
+                                                                                                                               "bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25")">
+                                                        @task.StatusFrench
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted mb-3">@task.Description</p>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @if (!string.IsNullOrEmpty(task.FormattedDuration))
+                                                    {
+                                                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                                            <i class="bi bi-clock me-1"></i>@task.FormattedDuration
+                                                        </span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(task.EnergyLevelFrench))
+                                                    {
+                                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                                                            <i class="bi bi-lightning-charge me-1"></i>@task.EnergyLevelFrench
+                                                        </span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(task.PriorityBadge))
+                                                    {
+                                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                                            <i class="bi bi-flag me-1"></i>@task.PriorityBadge
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            @if (task.Deadline.HasValue)
+                                            {
+                                                <small class="d-block @(task.IsOverdue ? "text-danger fw-bold" : "text-muted")">
+                                                    <i class="bi bi-calendar me-1"></i>
+                                                    @task.Deadline.Value.ToString("dd/MM/yyyy")
+                                                </small>
+                                            }
+                                            @if (task.CreatedAt != DateTime.MinValue)
+                                            {
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock-history me-1"></i>
+                                                    @task.CreatedAt.ToString("dd/MM/yyyy")
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Tasks.Any())
+{
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Animation des compteurs
+                function animateCounter(element, target, duration = 1000) {
+                    let start = 0;
+                    const increment = target / (duration / 16);
+                    let current = start;
+
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            element.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            element.textContent = Math.floor(current);
+                        }
+                    }, 16);
+                }
+
+                // Animer les compteurs
+                const counters = [
+                    { element: document.getElementById('totalTasks'), target: @totalTasks },
+                    { element: document.getElementById('completedTasks'), target: @completedTasks },
+                    { element: document.getElementById('todoTasks'), target: @todoTasks }
+                ];
+
+                counters.forEach(counter => {
+                    if (counter.element && counter.target > 0) {
+                        setTimeout(() => {
+                            animateCounter(counter.element, counter.target);
+                        }, 500);
+                    }
+                });
+
+                // Animer la barre de progression
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    const width = progressBar.style.width;
+                    progressBar.style.width = '0%';
+
+                    setTimeout(() => {
+                        progressBar.style.width = width;
+                    }, 800);
+                }
+
+                // Graphique de répartition
+                const ctx = document.getElementById('categoryTasksChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['À faire', 'En cours', 'Complétées'],
+                            datasets: [{
+                                data: [@todoTasks, @inProgressTasks, @completedTasks],
+                                backgroundColor: [
+                                    'rgba(108, 117, 125, 0.8)',
+                                    'rgba(13, 202, 240, 0.8)',
+                                    'rgba(25, 135, 84, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgb(108, 117, 125)',
+                                    'rgb(13, 202, 240)',
+                                    'rgb(25, 135, 84)'
+                                ],
+                                borderWidth: 2,
+                                hoverOffset: 15
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            cutout: '65%'
+                        }
+                    });
+                }
+
+                // Animation des cartes au survol
+                const statCards = document.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                    });
+
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+
+                // Animation des tâches au chargement
+                const taskItems = document.querySelectorAll('.list-group-item');
+                taskItems.forEach((item, index) => {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.5s ease';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateX(0)';
+                    }, index * 100 + 800);
+                });
+            });
+        </script>
+    }
+}
+
+<style>
+    /* Styles spécifiques aux détails */
+    .category-main-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .category-preview-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 3rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .color-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-item {
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+        .info-item:hover {
+            border-color: rgba(67, 97, 238, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(67, 97, 238, 0.2);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.1) !important;
+        }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .progress-wrapper {
+        position: relative;
+    }
+
+    .progress {
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .progress-bar {
+        position: relative;
+        transition: width 1.5s ease;
+        border-radius: 10px;
+    }
+
+    .progress-text {
+        position: absolute;
+        right: 10px;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-labels {
+        font-size: 0.8rem;
+    }
+
+    .list-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .task-check .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        cursor: default;
+    }
+
+        .task-check .form-check-input:checked {
+            background-color: #198754;
+            border-color: #198754;
+        }
+
+    .list-group-item {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+        .list-group-item:hover {
+            background-color: rgba(67, 97, 238, 0.02);
+            transform: translateX(5px);
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none !important;
+        }
+
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+    }
+
+    /* Fonction JavaScript pour assombrir les couleurs */
+    <text >
+    function darkenColor(color, percent) {
+        if (!color.startsWith('#')) return color;
+        let r = parseInt(color.slice(1, 3), 16);
+        let g = parseInt(color.slice(3, 5), 16);
+        let b = parseInt(color.slice(5, 7), 16);
+        r = Math.floor(r * (100 - percent) / 100);
+        g = Math.floor(g * (100 - percent) / 100);
+        b = Math.floor(b * (100 - percent) / 100);
+
+        return `#$ {
+            ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+        }
+
+        `;
+    }
+
+    </text >
+</style>

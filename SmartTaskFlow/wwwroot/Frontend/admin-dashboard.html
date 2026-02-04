@@ -1,0 +1,1575 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Smart Task Flow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --danger-color: #ef233c;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .logo i {
+                color: var(--primary-color);
+                font-size: 1.8rem;
+            }
+
+            .logo h1 {
+                color: var(--primary-color);
+                font-size: 1.8rem;
+            }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-details h3 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .admin-details p {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 2rem 1rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-item {
+            padding: 0.9rem 1rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+            .sidebar-item:hover, .sidebar-item.active {
+                background-color: #f0f2ff;
+                color: var(--primary-color);
+            }
+
+            .sidebar-item i {
+                font-size: 1.2rem;
+                width: 24px;
+            }
+
+        /* Main content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+        }
+
+        /* Statistics cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            border-top: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-card:nth-child(2) {
+                border-top-color: var(--success-color);
+            }
+
+            .stat-card:nth-child(3) {
+                border-top-color: var(--warning-color);
+            }
+
+            .stat-card:nth-child(4) {
+                border-top-color: #7209b7;
+            }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.95rem;
+            color: var(--gray-color);
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+            .stat-icon.users {
+                background-color: rgba(67, 97, 238, 0.1);
+                color: var(--primary-color);
+            }
+
+            .stat-icon.completed {
+                background-color: rgba(76, 201, 240, 0.1);
+                color: var(--success-color);
+            }
+
+            .stat-icon.late {
+                background-color: rgba(247, 37, 133, 0.1);
+                color: var(--warning-color);
+            }
+
+            .stat-icon.rate {
+                background-color: rgba(114, 9, 183, 0.1);
+                color: #7209b7;
+            }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-detail {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        /* Table section */
+        .table-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            display: block; /* Par défaut visible */
+        }
+
+        /* Tâches Section */
+        .tasks-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            display: none; /* Caché par défaut */
+        }
+
+        /* Analytics Section */
+        .analytics-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            display: none; /* Caché par défaut */
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+
+            .search-box input {
+                border: none;
+                background: transparent;
+                outline: none;
+                width: 100%;
+                padding: 0.5rem;
+            }
+
+            .search-box i {
+                color: var(--gray-color);
+            }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--light-gray);
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .filter-btn:hover, .filter-btn.active {
+                background-color: var(--primary-color);
+                color: white;
+                border-color: var(--primary-color);
+            }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+            .status.active {
+                background-color: rgba(76, 201, 240, 0.2);
+                color: var(--success-color);
+            }
+
+            .status.blocked {
+                background-color: rgba(239, 35, 60, 0.2);
+                color: var(--danger-color);
+            }
+
+            .status.completed {
+                background-color: rgba(76, 201, 240, 0.2);
+                color: var(--success-color);
+            }
+
+            .status.in-progress {
+                background-color: rgba(255, 193, 7, 0.2);
+                color: #ffc107;
+            }
+
+            .status.pending {
+                background-color: rgba(108, 117, 125, 0.2);
+                color: var(--gray-color);
+            }
+
+            .status.overdue {
+                background-color: rgba(247, 37, 133, 0.2);
+                color: var(--warning-color);
+            }
+
+        .completion-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .completion-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .action-btn.view {
+                background-color: rgba(67, 97, 238, 0.1);
+                color: var(--primary-color);
+            }
+
+            .action-btn.block {
+                background-color: rgba(247, 37, 133, 0.1);
+                color: var(--warning-color);
+            }
+
+            .action-btn.delete {
+                background-color: rgba(239, 35, 60, 0.1);
+                color: var(--danger-color);
+            }
+
+            .action-btn:hover {
+                transform: scale(1.1);
+            }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .chart-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .chart-placeholder {
+            height: 250px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-color);
+        }
+
+            .chart-placeholder i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                color: var(--primary-color);
+            }
+
+        /* Tasks List */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .task-item {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+            .task-item:hover {
+                background-color: #e9ecef;
+                transform: translateY(-2px);
+            }
+
+        .task-info h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .task-info p {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+            .modal-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .modal {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .user-details h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-details p {
+            color: var(--gray-color);
+            margin-bottom: 0.3rem;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-stat {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .user-stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .user-stat-label {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-block {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-close {
+            background-color: var(--light-gray);
+            color: var(--dark-color);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 1rem;
+            }
+
+            .sidebar-item {
+                white-space: nowrap;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .modal {
+                padding: 1.5rem;
+            }
+
+            .user-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .admin-info {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .task-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <a href="#" class="sidebar-item active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <!-- Icône Utilisateurs supprimée -->
+            <a href="#" class="sidebar-item" data-section="tasks">
+                <i class="fas fa-tasks"></i>
+                <span>Tâches</span>
+            </a>
+            <a href="#" class="sidebar-item" data-section="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytiques</span>
+            </a>
+            <a href="#" class="sidebar-item logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Déconnexion</span>
+            </a>
+        </nav>
+
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header>
+                <div class="logo">
+                    <i class="fas fa-stream"></i>
+                    <h1>Smart Task Flow</h1>
+                </div>
+                <div class="admin-info">
+                    <div class="admin-details">
+                        <h3 id="adminName">Chargement...</h3>
+                        <p id="adminEmail">Chargement...</p>
+                    </div>
+                    <div class="avatar" id="adminAvatar">?</div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main>
+                <!-- Dashboard Section (Par défaut visible) -->
+                <div id="dashboardSection" class="dashboard-section">
+                    <h2 class="section-title">Tableau de bord administrateur</h2>
+
+                    <!-- Statistics Cards -->
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Utilisateurs totaux</h3>
+                                <div class="stat-icon users">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-detail">0 actifs</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Tâches complétées</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-detail">Chargement...</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Tâches en retard</h3>
+                                <div class="stat-icon late">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-detail">Chargement...</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Taux de complétion</h3>
+                                <div class="stat-icon rate">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">0%</div>
+                            <div class="stat-detail">Chargement...</div>
+                        </div>
+                    </div>
+
+                    <!-- Users Table Section -->
+                    <div class="table-section" id="usersTableSection">
+                        <div class="table-controls">
+                            <h3 class="section-title">Gestion des utilisateurs</h3>
+
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Rechercher par nom ou email...">
+                            </div>
+
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" data-filter="all">Tous</button>
+                                <button class="filter-btn" data-filter="active">Actifs</button>
+                                <button class="filter-btn" data-filter="blocked">Bloqués</button>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Email</th>
+                                        <th>Tâches</th>
+                                        <th>Complétion</th>
+                                        <th>Statut</th>
+                                        <th>Date d'inscription</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Users will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tâches Section (Cachée par défaut) -->
+                <div id="tasksSection" class="tasks-section" style="display: none;">
+                    <h2 class="section-title">Gestion des Tâches</h2>
+
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Tâches totales</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="totalTasks">0</div>
+                            <div class="stat-detail">Toutes les tâches</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">En cours</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-spinner"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="inProgressTasks">0</div>
+                            <div class="stat-detail">Tâches actives</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Complétées</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="completedTasks">0</div>
+                            <div class="stat-detail">Cette semaine</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">En retard</h3>
+                                <div class="stat-icon late">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="overdueTasks">0</div>
+                            <div class="stat-detail">À traiter</div>
+                        </div>
+                    </div>
+
+                    <div class="table-controls">
+                        <h3 class="section-title">Liste des tâches</h3>
+
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="taskSearchInput" placeholder="Rechercher une tâche...">
+                        </div>
+
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-task-filter="all">Toutes</button>
+                            <button class="filter-btn" data-task-filter="pending">En attente</button>
+                            <button class="filter-btn" data-task-filter="in-progress">En cours</button>
+                            <button class="filter-btn" data-task-filter="completed">Terminées</button>
+                        </div>
+                    </div>
+
+                    <div class="tasks-list" id="tasksList">
+                        <!-- Tâches seront chargées ici -->
+                        <div class="task-item">
+                            <div class="task-info">
+                                <h4>Mise à jour du système</h4>
+                                <p>Mettre à jour les serveurs de production avec les derniers correctifs de sécurité</p>
+                                <div class="task-meta">
+                                    <span><i class="far fa-user"></i> Admin System</span>
+                                    <span><i class="far fa-calendar"></i> Échéance: 15/12/2023</span>
+                                    <span><i class="far fa-clock"></i> Priorité: Haute</span>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <span class="status in-progress">En cours</span>
+                            </div>
+                        </div>
+
+                        <div class="task-item">
+                            <div class="task-info">
+                                <h4>Analyse des performances</h4>
+                                <p>Analyser les données de performance du dernier trimestre</p>
+                                <div class="task-meta">
+                                    <span><i class="far fa-user"></i> Admin System</span>
+                                    <span><i class="far fa-calendar"></i> Échéance: 10/12/2023</span>
+                                    <span><i class="far fa-clock"></i> Priorité: Moyenne</span>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <span class="status completed">Terminée</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section (Cachée par défaut) -->
+                <div id="analyticsSection" class="analytics-section" style="display: none;">
+                    <h2 class="section-title">Analytiques & Rapports</h2>
+
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Activité utilisateurs</h3>
+                                <div class="stat-icon users">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">87%</div>
+                            <div class="stat-detail">Taux d'activité journalier</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Productivité</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">+12%</div>
+                            <div class="stat-detail">vs mois dernier</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Engagement</h3>
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">94%</div>
+                            <div class="stat-detail">Taux de complétion</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Satisfaction</h3>
+                                <div class="stat-icon rate">
+                                    <i class="fas fa-smile"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">4.8/5</div>
+                            <div class="stat-detail">Note moyenne</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Tâches par statut</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                <p>Graphique des tâches par statut</p>
+                                <small>Données chargées dynamiquement</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Activité des utilisateurs</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Graphique d'activité mensuelle</p>
+                                <small>Données chargées dynamiquement</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Taux de complétion</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line"></i>
+                                <p>Évolution du taux de complétion</p>
+                                <small>Données chargées dynamiquement</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Performance par équipe</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-area"></i>
+                                <p>Comparatif des performances</p>
+                                <small>Données chargées dynamiquement</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Détails utilisateur</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar" id="modalAvatar">?</div>
+                <div class="user-details">
+                    <h3 id="modalName">Chargement...</h3>
+                    <p id="modalEmail">Chargement...</p>
+                    <p id="modalStatus">Statut: <span class="status active">Chargement...</span></p>
+                    <p id="modalJoinDate">Inscrit le: Chargement...</p>
+                </div>
+            </div>
+
+            <div class="user-stats">
+                <div class="user-stat">
+                    <div class="user-stat-value" id="modalTasks">0</div>
+                    <div class="user-stat-label">Tâches créées</div>
+                </div>
+                <div class="user-stat">
+                    <div class="user-stat-value" id="modalCompletion">0%</div>
+                    <div class="user-stat-label">Taux de complétion</div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-close" id="cancelModal">Fermer</button>
+                <button class="btn btn-block" id="blockUserBtn">Bloquer l'utilisateur</button>
+                <button class="btn btn-delete" id="deleteUserBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vérification d'authentification et rôle admin
+        const token = localStorage.getItem("authToken");
+        const role = localStorage.getItem("userRole");
+        const userName = localStorage.getItem("userName");
+
+        if (!token || role !== "Admin") {
+            window.location.href = "/index.html";
+        }
+
+        const API = "/api/admin";
+        let usersData = [];
+        let currentUser = null;
+
+        // Éléments DOM
+        const usersTable = document.querySelector('#usersTable tbody');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelModalBtn = document.getElementById('cancelModal');
+        const blockUserBtn = document.getElementById('blockUserBtn');
+        const deleteUserBtn = document.getElementById('deleteUserBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminName = document.getElementById('adminName');
+        const adminEmail = document.getElementById('adminEmail');
+        const adminAvatar = document.getElementById('adminAvatar');
+
+        // Sections
+        const dashboardSection = document.getElementById('dashboardSection');
+        const tasksSection = document.getElementById('tasksSection');
+        const analyticsSection = document.getElementById('analyticsSection');
+        const usersTableSection = document.getElementById('usersTableSection');
+
+        // Variables d'état
+        let currentFilter = 'all';
+
+        // Initialisation
+        document.addEventListener("DOMContentLoaded", () => {
+            // Afficher les informations de l'admin
+            loadAdminInfo();
+
+            // Charger les données
+            loadStatistics();
+            loadUsers();
+            setupEventListeners();
+
+            // Charger les données des tâches
+            loadTasksData();
+        });
+
+        // Charger les informations de l'administrateur
+        function loadAdminInfo() {
+            if (userName) {
+                adminName.textContent = userName;
+                // Générer les initiales pour l'avatar
+                const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+                adminAvatar.textContent = initials || 'A';
+            }
+
+            // Simuler un email admin (à remplacer par des données réelles si disponibles)
+            adminEmail.textContent = "admin@smarttaskflow.com";
+        }
+
+        // Gérer la déconnexion
+        function handleLogout() {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("userName");
+            window.location.href = "/index.html";
+        }
+
+        // Charger les statistiques depuis l'API
+        async function loadStatistics() {
+            try {
+                const res = await fetch(`${API}/statistics`, {
+                    headers: { Authorization: "Bearer " + token }
+                });
+
+                if (!res.ok) throw new Error("Erreur lors du chargement des statistiques");
+
+                const stats = await res.json();
+
+                document.querySelectorAll(".stat-value")[0].innerText = stats.totalUsers;
+                document.querySelectorAll(".stat-value")[1].innerText = stats.tasksCompleted;
+                document.querySelectorAll(".stat-value")[2].innerText = stats.tasksOverdue;
+                document.querySelectorAll(".stat-value")[3].innerText = stats.avgCompletionRate + "%";
+
+                document.querySelectorAll(".stat-detail")[0].innerText =
+                    `${stats.activeUsers} actifs`;
+            } catch (error) {
+                console.error("Erreur:", error);
+                // Valeurs par défaut en cas d'erreur
+                document.querySelectorAll(".stat-value")[0].innerText = "0";
+                document.querySelectorAll(".stat-value")[1].innerText = "0";
+                document.querySelectorAll(".stat-value")[2].innerText = "0";
+                document.querySelectorAll(".stat-value")[3].innerText = "0%";
+                document.querySelectorAll(".stat-detail")[0].innerText = "0 actifs";
+            }
+        }
+
+        // Charger les données des tâches
+        async function loadTasksData() {
+            try {
+                // Simuler le chargement des données des tâches
+                // À remplacer par un appel API réel
+                setTimeout(() => {
+                    document.getElementById('totalTasks').textContent = "1,247";
+                    document.getElementById('inProgressTasks').textContent = "342";
+                    document.getElementById('completedTasks').textContent = "784";
+                    document.getElementById('overdueTasks').textContent = "121";
+                }, 1000);
+            } catch (error) {
+                console.error("Erreur lors du chargement des tâches:", error);
+            }
+        }
+
+        // Charger les utilisateurs depuis l'API
+        async function loadUsers(status = "all") {
+            try {
+                const res = await fetch(`${API}/users?status=${status}`, {
+                    headers: { Authorization: "Bearer " + token }
+                });
+
+                if (!res.ok) throw new Error("Erreur lors du chargement des utilisateurs");
+
+                usersData = await res.json();
+                populateUsersTable(usersData);
+            } catch (error) {
+                console.error("Erreur:", error);
+                usersData = [];
+                populateUsersTable(usersData);
+                alert("Impossible de charger les utilisateurs. Veuillez réessayer.");
+            }
+        }
+
+        // Remplir le tableau des utilisateurs
+        function populateUsersTable(users) {
+            usersTable.innerHTML = '';
+
+            if (users.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" style="text-align: center; padding: 2rem; color: var(--gray-color);">Aucun utilisateur trouvé</td>`;
+                usersTable.appendChild(row);
+                return;
+            }
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-user-id', user.id);
+
+                // Correction: Vérifier que le statut est correctement interprété
+                const userStatus = user.Status || user.status || 'active';
+                const isActive = userStatus === 'active';
+
+                // Créer la barre de progression pour le taux de complétion
+                const completionRate = user.CompletionRate || user.completionRate || 0;
+                const completionBar = `
+                        <div class="completion-bar">
+                            <div class="completion-fill" style="width: ${completionRate}%"></div>
+                        </div>
+                        <span>${completionRate}%</span>
+                    `;
+
+                // Déterminer le texte et la classe du statut
+                const statusText = isActive ? 'Actif' : 'Bloqué';
+                const statusClass = isActive ? 'active' : 'blocked';
+
+                // Formater la date d'inscription (correction du format)
+                let joinDate = 'N/A';
+                if (user.JoinDate || user.joinDate || user.createdAt) {
+                    const date = new Date(user.JoinDate || user.joinDate || user.createdAt);
+                    if (!isNaN(date.getTime())) {
+                        joinDate = date.toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                }
+
+                // Icône pour le bouton bloquer/débloquer
+                const blockIcon = isActive ? 'fa-lock' : 'fa-unlock';
+
+                row.innerHTML = `
+                        <td>${user.name || 'Non renseigné'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${user.TasksCount || user.tasksCount || 0}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                ${completionBar}
+                            </div>
+                        </td>
+                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>${joinDate}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn view" data-action="view" data-id="${user.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn block" data-action="toggleBlock" data-id="${user.id}">
+                                    <i class="fas ${blockIcon}"></i>
+                                </button>
+                                <button class="action-btn delete" data-action="delete" data-id="${user.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+
+                usersTable.appendChild(row);
+            });
+
+            // Ajouter les écouteurs d'événements aux boutons d'action
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', handleActionClick);
+            });
+        }
+
+        // Configurer les écouteurs d'événements
+        function setupEventListeners() {
+            // Recherche utilisateurs
+            searchInput.addEventListener('input', filterUsers);
+
+            // Filtres utilisateurs
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Retirer la classe active de tous les boutons
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    // Ajouter la classe active au bouton cliqué
+                    btn.classList.add('active');
+                    currentFilter = btn.getAttribute('data-filter');
+                    loadUsers(currentFilter);
+                });
+            });
+
+            // Modal
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelModalBtn.addEventListener('click', closeModal);
+            blockUserBtn.addEventListener('click', toggleBlockUser);
+            deleteUserBtn.addEventListener('click', deleteUser);
+
+            // Déconnexion
+            logoutBtn.addEventListener('click', handleLogout);
+
+            // Fermer le modal en cliquant à l'extérieur
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            // Gestion des clics sur les éléments de sidebar
+            document.querySelectorAll('.sidebar-item[data-section]').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+
+                    // Retirer la classe active de tous les éléments
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    // Ajouter la classe active à l'élément cliqué
+                    this.classList.add('active');
+
+                    // Masquer toutes les sections
+                    dashboardSection.style.display = 'none';
+                    tasksSection.style.display = 'none';
+                    analyticsSection.style.display = 'none';
+
+                    // Afficher la section correspondante
+                    if (section === 'dashboard') {
+                        dashboardSection.style.display = 'block';
+                        document.querySelector('.section-title').textContent = "Tableau de bord administrateur";
+                    } else if (section === 'tasks') {
+                        tasksSection.style.display = 'block';
+                        document.querySelector('#tasksSection .section-title').textContent = "Gestion des Tâches";
+                    } else if (section === 'analytics') {
+                        analyticsSection.style.display = 'block';
+                        document.querySelector('#analyticsSection .section-title').textContent = "Analytiques & Rapports";
+                    }
+                });
+            });
+        }
+
+        // Gérer les clics sur les boutons d'action
+        function handleActionClick(e) {
+            e.stopPropagation();
+            const action = e.currentTarget.getAttribute('data-action');
+            const userId = parseInt(e.currentTarget.getAttribute('data-id'));
+
+            // Trouver l'utilisateur correspondant
+            const user = usersData.find(u => u.id === userId);
+
+            if (!user) return;
+
+            if (action === 'view') {
+                openUserModal(user);
+            } else if (action === 'toggleBlock') {
+                toggleUserStatus(userId);
+            } else if (action === 'delete') {
+                deleteUserRow(userId);
+            }
+        }
+
+        // Filtrer les utilisateurs (recherche locale)
+        function filterUsers() {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            const filtered = usersData.filter(u =>
+                (u.name && u.name.toLowerCase().includes(searchTerm)) ||
+                (u.email && u.email.toLowerCase().includes(searchTerm))
+            );
+
+            populateUsersTable(filtered);
+        }
+
+        // Ouvrir le modal des détails utilisateur
+        async function openUserModal(user) {
+            try {
+                const res = await fetch(`${API}/users/${user.id}`, {
+                    headers: { Authorization: "Bearer " + token }
+                });
+
+                if (!res.ok) throw new Error("Erreur lors du chargement des détails");
+
+                const u = await res.json();
+                currentUser = u;
+
+                // Initiales pour l'avatar (première lettre du nom)
+                const initials = u.name ? u.name.charAt(0).toUpperCase() : '?';
+
+                document.getElementById('modalAvatar').textContent = initials;
+                document.getElementById('modalName').textContent = u.name || 'N/A';
+                document.getElementById('modalEmail').textContent = u.email || 'N/A';
+                document.getElementById('modalTasks').textContent = u.TasksCount || u.tasksCount || 0;
+                document.getElementById('modalCompletion').textContent = (u.CompletionRate || u.completionRate || 0) + "%";
+
+                // Formater la date d'inscription
+                let joinDate = 'N/A';
+                if (u.JoinDate || u.joinDate || u.createdAt) {
+                    const date = new Date(u.JoinDate || u.joinDate || u.createdAt);
+                    if (!isNaN(date.getTime())) {
+                        joinDate = date.toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                }
+                document.getElementById('modalJoinDate').textContent = `Inscrit le: ${joinDate}`;
+
+                // Mettre à jour le statut
+                const userStatus = u.Status || u.status || 'active';
+                const isActive = userStatus === 'active';
+                const statusElement = document.querySelector('#modalStatus .status');
+                statusElement.textContent = isActive ? "Actif" : "Bloqué";
+                statusElement.className = `status ${isActive ? 'active' : 'blocked'}`;
+
+                // Mettre à jour le texte du bouton Bloquer/Débloquer
+                blockUserBtn.textContent = isActive ? "Bloquer l'utilisateur" : "Débloquer l'utilisateur";
+
+                // Afficher le modal
+                modalOverlay.classList.add("active");
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error("Erreur:", error);
+                alert("Impossible de charger les détails de l'utilisateur.");
+            }
+        }
+
+        // Fermer le modal
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentUser = null;
+        }
+
+        // Changer le statut d'un utilisateur (actif/bloqué) via API
+        async function toggleUserStatus(userId) {
+            try {
+                // Trouver l'utilisateur actuel pour déterminer l'action
+                const user = usersData.find(u => u.id === userId);
+                if (!user) return;
+
+                const userStatus = user.Status || user.status || 'active';
+                const isActive = userStatus === 'active';
+                const action = isActive ? 'block' : 'unblock';
+
+                const response = await fetch(`${API}/users/${userId}/${action}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) throw new Error("Erreur lors du changement de statut");
+
+                // Recharger les utilisateurs avec le filtre actuel
+                await loadUsers(currentFilter);
+
+                // Fermer le modal si ouvert
+                closeModal();
+
+                // Afficher un message de succès
+                alert(`Utilisateur ${isActive ? 'bloqué' : 'débloqué'} avec succès`);
+            } catch (error) {
+                console.error("Erreur:", error);
+                alert("Impossible de modifier le statut de l'utilisateur.");
+            }
+        }
+
+        // Supprimer un utilisateur via API
+        async function deleteUserRow(userId) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.")) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/users/${userId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
+
+                if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+                // Recharger les utilisateurs avec le filtre actuel
+                await loadUsers(currentFilter);
+
+                // Fermer le modal si ouvert
+                closeModal();
+
+                // Afficher un message de succès
+                alert("Utilisateur supprimé avec succès");
+            } catch (error) {
+                console.error("Erreur:", error);
+                alert("Impossible de supprimer l'utilisateur.");
+            }
+        }
+
+        // Gérer le blocage/déblocage depuis le modal
+        function toggleBlockUser() {
+            if (!currentUser) return;
+
+            toggleUserStatus(currentUser.id);
+        }
+
+        // Gérer la suppression depuis le modal
+        function deleteUser() {
+            if (!currentUser) return;
+
+            deleteUserRow(currentUser.id);
+        }
+    </script>
+</body>
+</html>

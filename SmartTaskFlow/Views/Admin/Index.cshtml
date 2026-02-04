@@ -1,0 +1,201 @@
+﻿@model dynamic
+
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-shield-lock"></i> Tableau de bord Administrateur
+        </h2>
+        <a asp-action="Index" asp-controller="Task" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour aux tâches
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-people-fill"></i> Utilisateurs
+                    </h5>
+                    <h2 class="mb-0">@Model.TotalUsers</h2>
+                    <small>@Model.ActiveUsers actifs / @Model.InactiveUsers inactifs</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-check-circle-fill"></i> Tâches
+                    </h5>
+                    <h2 class="mb-0">@Model.TotalTasks</h2>
+                    <small>@Model.CompletedTasks complétées</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-clock-fill"></i> En cours
+                    </h5>
+                    <h2 class="mb-0">@Model.PendingTasks</h2>
+                    <small>tâches à faire</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-bookmark-fill"></i> Catégories
+                    </h5>
+                    <h2 class="mb-0">@Model.TotalCategories</h2>
+                    <small>catégories créées</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu de navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-menu-button-wide"></i> Menu Administration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a asp-action="Users" class="btn btn-outline-primary w-100 p-3">
+                                <i class="bi bi-people fs-1 d-block mb-2"></i>
+                                Gérer les utilisateurs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-action="AllTasks" class="btn btn-outline-success w-100 p-3">
+                                <i class="bi bi-list-task fs-1 d-block mb-2"></i>
+                                Toutes les tâches
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-action="AllCategories" class="btn btn-outline-info w-100 p-3">
+                                <i class="bi bi-bookmark fs-1 d-block mb-2"></i>
+                                Toutes les catégories
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-action="Statistics" class="btn btn-outline-warning w-100 p-3">
+                                <i class="bi bi-graph-up fs-1 d-block mb-2"></i>
+                                Statistiques
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a asp-action="ActivityLogs" class="btn btn-outline-secondary w-100 p-3">
+                                <i class="bi bi-journal-text fs-1 d-block mb-2"></i>
+                                Journal d'activité
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activités récentes -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Activités Récentes</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivities.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Utilisateur</th>
+                                        <th>Action</th>
+                                        <th>Tâche</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in Model.RecentActivities)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <small>@log.ActionDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <strong>@log.User.FullName</strong>
+                                                <br />
+                                                <small class="text-muted">@log.User.Username</small>
+                                            </td>
+                                            <td>
+                                                @if (log.Action == "Created")
+                                                {
+                                                    <span class="badge bg-success">Créée</span>
+                                                }
+                                                else if (log.Action == "Completed")
+                                                {
+                                                    <span class="badge bg-primary">Complétée</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@log.Action</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (log.Task != null)
+                                                {
+                                                    <text>@log.Task.Title</text>
+                                                }
+                                                else
+                                                {
+                                                    <em class="text-muted">Tâche supprimée</em>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i> Aucune activité récente.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

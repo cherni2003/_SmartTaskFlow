@@ -1,0 +1,375 @@
+﻿@model SmartTaskFlow.Models.Category
+
+@{
+    ViewData["Subtitle"] = "Nouvelle catégorie personnalisée";
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- En-tête -->
+            <div class="mb-5 animate-slide-up">
+                <div class="badge bg-gradient-success bg-opacity-10 text-success rounded-pill px-4 py-2 mb-3 d-inline-flex align-items-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    <span class="fw-semibold">Nouvelle catégorie</span>
+                </div>
+                <h1 class="display-5 fw-bold mb-2">➕ Créer une catégorie</h1>
+                <p class="text-muted mb-0">Organisez vos tâches efficacement</p>
+            </div>
+
+            <div class="card border-0 shadow-xl rounded-4 overflow-hidden animate-fade-in">
+                <div class="card-header bg-gradient-success bg-opacity-10 border-0 py-4 px-5">
+                    <div class="d-flex align-items-center">
+                        <div class="create-icon bg-gradient-success rounded-circle d-inline-flex align-items-center justify-content-center p-3 me-3">
+                            <i class="bi bi-plus-lg text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Nouvelle catégorie</h5>
+                            <small class="text-muted">Remplissez les informations ci-dessous</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-5 rounded-3 border-0" role="alert">
+                            <div class="me-3">
+                                <div class="alert-icon bg-danger bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center p-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-0">Des erreurs sont présentes</h6>
+                                <p class="mb-0">Veuillez corriger les erreurs ci-dessous</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <div class="row mb-5">
+                            <div class="col-lg-8">
+                                <!-- Nom de la catégorie -->
+                                <div class="mb-4">
+                                    <label asp-for="CategoryName" class="form-label fw-bold d-flex align-items-center">
+                                        <i class="bi bi-card-heading me-2 text-primary"></i>
+                                        Nom de la catégorie
+                                        <span class="text-danger ms-1">*</span>
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-tag text-muted"></i>
+                                        </span>
+                                        <input asp-for="CategoryName"
+                                               class="form-control border-start-0 ps-0"
+                                               placeholder="Ex: Travail, Projets, Loisirs..."
+                                               required />
+                                    </div>
+                                    <span asp-validation-for="CategoryName" class="text-danger small"></span>
+                                    <div class="form-text">
+                                        Choisissez un nom clair et descriptif pour votre catégorie (max 50 caractères)
+                                    </div>
+                                </div>
+
+                                <!-- Icône -->
+                                <div class="mb-4">
+                                    <label asp-for="Icon" class="form-label fw-bold d-flex align-items-center">
+                                        <i class="bi bi-emoji-smile me-2 text-warning"></i>
+                                        Icône
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-emoji-smile text-muted"></i>
+                                        </span>
+                                        <input asp-for="Icon"
+                                               class="form-control border-start-0 ps-0"
+                                               placeholder="Ex: 💼, 🎨, 🏋️"
+                                               maxlength="2" />
+                                    </div>
+                                    <span asp-validation-for="Icon" class="text-danger small"></span>
+                                    <div class="form-text d-flex align-items-center">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Choisissez un emoji (1-2 caractères) pour représenter votre catégorie
+                                    </div>
+                                </div>
+
+                                <!-- Couleur -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold d-flex align-items-center mb-3">
+                                        <i class="bi bi-palette me-2 text-info"></i>
+                                        Personnalisation de la couleur
+                                    </label>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label asp-for="ColorCode" class="form-label fw-semibold">Couleur personnalisée</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0">
+                                                    <i class="bi bi-eyedropper text-muted"></i>
+                                                </span>
+                                                <input asp-for="ColorCode" type="text"
+                                                       class="form-control border-start-0 ps-0 color-text-input"
+                                                       placeholder="#4361ee"
+                                                       pattern="^#[0-9A-Fa-f]{6}$"
+                                                       value="#4361ee"
+                                                       maxlength="7" />
+                                                <input asp-for="ColorCode" type="color"
+                                                       class="form-control form-control-color color-picker"
+                                                       style="width: 60px; height: 42px;"
+                                                       value="#4361ee" />
+                                            </div>
+                                            <span asp-validation-for="ColorCode" class="text-danger small"></span>
+                                            <div class="form-text">
+                                                Format hexadécimal (#RRGGBB)
+                                            </div>
+                                        </div>
+
+                                        <!-- Palette de couleurs prédéfinies -->
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Couleurs suggérées</label>
+                                            <div class="color-palette d-flex gap-2 flex-wrap">
+                                                @{
+                                                    var colors = new Dictionary<string, string>
+                                                                                                {
+                                                                                                { "Travail", "#4361ee" },
+                                                                                                { "Études", "#06d6a0" },
+                                                                                                { "Personnel", "#ffd166" },
+                                                                                                { "Sport", "#ef476f" },
+                                                                                                { "Santé", "#7209b7" },
+                                                                                                { "Loisirs", "#4cc9f0" },
+                                                                                                { "Finance", "#f72585" },
+                                                                                                { "Voyage", "#3a0ca3" }
+                                                                                                };
+                                                }
+                                                @foreach (var color in colors)
+                                                {
+                                                    <button type="button"
+                                                            class="color-option rounded-circle border-0"
+                                                            style="width: 32px; height: 32px; background-color: @color.Value;"
+                                                            data-color="@color.Value"
+                                                            data-name="@color.Key"
+                                                            title="@color.Key">
+                                                        @if (color.Value == "#4361ee")
+                                                        {
+                                                            <i class="bi bi-check text-white"></i>
+                                                        }
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aperçu -->
+                            <div class="col-lg-4">
+                                <div class="preview-wrapper position-sticky" style="top: 20px;">
+                                    <label class="form-label fw-bold d-flex align-items-center mb-3">
+                                        <i class="bi bi-eye me-2 text-success"></i>
+                                        Aperçu en direct
+                                    </label>
+                                    <div class="preview-card card border-0 shadow-sm h-100 overflow-hidden rounded-4"
+                                         id="preview">
+                                        <div class="card-body d-flex flex-column justify-content-center align-items-center text-white py-5">
+                                            <div class="preview-icon mb-4" id="previewIcon">
+                                                📁
+                                            </div>
+                                            <h4 class="fw-bold text-center mb-2" id="previewName">
+                                                Nom de la catégorie
+                                            </h4>
+                                            <p class="text-center opacity-75 mb-0">Aperçu en temps réel</p>
+                                            <div class="preview-badge mt-4 bg-white bg-opacity-20 rounded-pill px-3 py-1">
+                                                Nouvelle catégorie
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Suggestions de catégories -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-5">
+                            <div class="card-header bg-light border-0 py-3 px-4">
+                                <h6 class="mb-0 fw-semibold d-flex align-items-center">
+                                    <i class="bi bi-lightbulb me-2 text-warning"></i>
+                                    Suggestions populaires
+                                </h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <p class="text-muted mb-3">Cliquez sur une suggestion pour remplir automatiquement les champs :</p>
+                                <div class="suggestions-grid">
+                                    @{
+                                        var suggestions = new[]
+                                        {
+                                                                        new { Name = "Travail", Icon = "💼", Color = "#4361ee" },
+                                                                        new { Name = "Études", Icon = "📚", Color = "#06d6a0" },
+                                                                        new { Name = "Personnel", Icon = "🏠", Color = "#ffd166" },
+                                                                        new { Name = "Sport", Icon = "🏋️", Color = "#ef476f" },
+                                                                        new { Name = "Santé", Icon = "❤️", Color = "#7209b7" },
+                                                                        new { Name = "Loisirs", Icon = "🎮", Color = "#4cc9f0" },
+                                                                        new { Name = "Projets", Icon = "🚀", Color = "#f72585" },
+                                                                        new { Name = "Finance", Icon = "💰", Color = "#3a0ca3" }
+                                                                        };
+                                    }
+                                    <div class="row g-3">
+                                        @foreach (var suggestion in suggestions)
+                                        {
+                                            <div class="col-md-3 col-sm-6">
+                                                <button type="button"
+                                                        class="suggestion-btn w-100 text-start p-3 rounded-3 border-0 bg-light transition-all"
+                                                        onclick="fillSuggestion('@suggestion.Name', '@suggestion.Icon', '@suggestion.Color')">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div class="suggestion-icon rounded-circle d-flex align-items-center justify-content-center p-2 me-3"
+                                                             style="background-color: @suggestion.Color; color: white; width: 36px; height: 36px;">
+                                                            @suggestion.Icon
+                                                        </div>
+                                                        <h6 class="mb-0 fw-semibold">@suggestion.Name</h6>
+                                                    </div>
+                                                    <small class="text-muted">Catégorie @suggestion.Name.ToLower()</small>
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 d-flex align-items-center">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Retour aux catégories
+                                </a>
+                            </div>
+                            <button type="submit"
+                                    class="btn btn-success btn-lg px-5 py-3 shadow-sm-hover d-flex align-items-center">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Créer la catégorie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Fonction GLOBALE pour remplir les suggestions
+        function fillSuggestion(name, icon, color) {
+            console.log('fillSuggestion appelé avec:', name, icon, color);
+
+            // Récupérer les éléments
+            const nameInput = document.querySelector('[name="CategoryName"]');
+            const iconInput = document.querySelector('[name="Icon"]');
+            const colorTextInput = document.querySelector('.color-text-input');
+            const colorPicker = document.querySelector('.color-picker');
+
+            // Vérifier si les éléments existent
+            if (!nameInput || !iconInput || !colorTextInput || !colorPicker) {
+                console.error('Un ou plusieurs éléments ne sont pas trouvés');
+                return;
+            }
+
+            // Remplir les champs
+            nameInput.value = name;
+            iconInput.value = icon;
+            colorTextInput.value = color;
+            colorPicker.value = color;
+
+            // Déclencher les événements pour mettre à jour l'aperçu
+            const event = new Event('input', { bubbles: true });
+            nameInput.dispatchEvent(event);
+            iconInput.dispatchEvent(event);
+            colorTextInput.dispatchEvent(event);
+
+            // Afficher un feedback visuel
+            const previewIcon = document.getElementById('previewIcon');
+            if (previewIcon) {
+                previewIcon.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    previewIcon.style.transform = 'scale(1)';
+                }, 300);
+            }
+
+            console.log('Champs mis à jour avec succès');
+        }
+
+        // Initialisation après le chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM chargé - initialisation en cours');
+
+            // Éléments du formulaire
+            const nameInput = document.querySelector('[name="CategoryName"]');
+            const iconInput = document.querySelector('[name="Icon"]');
+            const colorTextInput = document.querySelector('.color-text-input');
+            const colorPicker = document.querySelector('.color-picker');
+
+            if (!nameInput || !iconInput || !colorTextInput || !colorPicker) {
+                console.error('Éléments du formulaire non trouvés');
+                return;
+            }
+
+            // Fonction pour mettre à jour l'aperçu
+            function updatePreview() {
+                const preview = document.getElementById('preview');
+                const previewName = document.getElementById('previewName');
+                const previewIcon = document.getElementById('previewIcon');
+
+                if (!preview || !previewName || !previewIcon) return;
+
+                const name = nameInput.value || 'Nom de la catégorie';
+                const icon = iconInput.value || '📁';
+                const color = colorTextInput.value || '#4361ee';
+
+                // Mettre à jour le texte
+                previewName.textContent = name;
+                previewIcon.textContent = icon;
+
+                // Mettre à jour la couleur
+                const isValidColor = /^#[0-9A-Fa-f]{6}$/i.test(color);
+                const displayColor = isValidColor ? color : '#4361ee';
+
+                // Créer un dégradé plus foncé
+                function darkenColor(hex, percent) {
+                    if (!hex.startsWith('#')) return hex;
+
+                    hex = hex.replace('#', '');
+                    const num = parseInt(hex, 16);
+
+                    let r = (num >> 16) & 255;
+                    let g = (num >> 8) & 255;
+                    let b = num & 255;
+
+                    r = Math.floor(r * (100 - percent) / 100);
+                    g = Math.floor(g * (100 - percent) / 100);
+                    b = Math.floor(b * (100 - percent) / 100);
+
+                    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                }
+
+                const darkerColor = darkenColor(displayColor, 20);
+                preview.style.background = `linear-gradient(135deg, ${displayColor}, ${darkerColor})`;
+            }
+
+            // Écouteurs d'événements
+            nameInput.addEventListener('input', updatePreview);
+            iconInput.addEventListener('input', updatePreview);
+            colorTextInput.addEventListener('input', updatePreview);
+            colorPicker.addEventListener('input', function() {
+                colorTextInput.value = this.value;
+                updatePreview();
+            });
+
+            // Initialiser l'aperçu
+            updatePreview();
+
+            // Tester la fonction fillSuggestion
+            console.log('fillSuggestion disponible:', typeof window.fillSuggestion);
+        });
+    </script>
+}

@@ -1,0 +1,164 @@
+﻿@model IEnumerable<SmartTaskFlow.Models.TaskItem>
+
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-list-task"></i> Toutes les Tâches
+        </h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">@Model.Count()</h3>
+                    <small class="text-muted">Total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">@Model.Count(t => t.Status == "Completed")</h3>
+                    <small class="text-muted">Complétées</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-warning">@Model.Count(t => t.Status == "InProgress")</h3>
+                    <small class="text-muted">En cours</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-info">@Model.Count(t => t.Status == "ToDo")</h3>
+                    <small class="text-muted">À faire</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des tâches -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-list"></i> Liste complète (@Model.Count() tâches)
+            </h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Utilisateur</th>
+                                <th>Catégorie</th>
+                                <th>Priorité</th>
+                                <th>Statut</th>
+                                <th>Deadline</th>
+                                <th>Créée le</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var task in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@task.Title</strong>
+                                        @if (!string.IsNullOrEmpty(task.Description))
+                                        {
+                                            <br />
+                                            <small class="text-muted">
+                                                @(task.Description.Length > 50 ? task.Description.Substring(0, 50) + "..." : task.Description)
+                                            </small>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong>@task.User.FullName</strong>
+                                        <br />
+                                        <small class="text-muted">@task.User.Username</small>
+                                    </td>
+                                    <td>
+                                        @if (task.Category != null)
+                                        {
+                                            <span class="badge" style="background-color: @task.Category.ColorCode">
+                                                @task.Category.Icon @task.Category.CategoryName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <em class="text-muted">Sans catégorie</em>
+                                        }
+                                    </td>
+                                    <td>
+                                        @for (int i = 0; i < task.Priority; i++)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (task.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Complétée
+                                            </span>
+                                        }
+                                        else if (task.Status == "InProgress")
+                                        {
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-hourglass-split"></i> En cours
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-circle"></i> À faire
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (task.Deadline.HasValue)
+                                        {
+                                            <small>@task.Deadline.Value.ToString("dd/MM/yyyy")</small>
+                                            @if (task.IsOverdue)
+                                            {
+                                                <br />
+                                
+                                                <span class="badge bg-danger">En retard</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <em class="text-muted">Aucune</em>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@task.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Aucune tâche trouvée.
+                </div>
+            }
+        </div>
+    </div>
+</div>

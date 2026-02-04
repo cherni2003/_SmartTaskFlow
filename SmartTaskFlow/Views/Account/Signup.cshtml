@@ -1,0 +1,982 @@
+﻿@{
+    ViewData["Title"] = "Inscription - SmartTaskFlow";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .signup-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bg-gradient-animated {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .gradient-1 {
+            width: 700px;
+            height: 700px;
+            background: var(--primary-gradient);
+            top: -300px;
+            left: -200px;
+        }
+
+        .gradient-2 {
+            width: 600px;
+            height: 600px;
+            background: var(--success-gradient);
+            bottom: -250px;
+            right: -200px;
+            animation-delay: 3s;
+        }
+
+        .gradient-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #7209b7 0%, #3a0ca3 100%);
+            top: 30%;
+            right: 10%;
+            animation-delay: 6s;
+        }
+
+        .signup-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .signup-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .signup-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            animation: slideInRight 0.8s ease-out 0.2s both;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+        }
+
+            .progress-steps::before {
+                content: '';
+                position: absolute;
+                top: 20px;
+                left: 5%;
+                right: 5%;
+                height: 2px;
+                background: #e1e5e9;
+                z-index: 1;
+            }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e1e5e9;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-gradient);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+            .form-section.active {
+                display: block;
+            }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+            .form-header h3 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-header p {
+                color: #666;
+                font-size: 0.95rem;
+            }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control {
+            padding: 0.875rem 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+            width: 100%;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+                transform: translateY(-1px);
+            }
+
+        .password-strength {
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak {
+            background: #ef476f;
+            width: 33%;
+        }
+
+        .strength-medium {
+            background: #ffd166;
+            width: 66%;
+        }
+
+        .strength-strong {
+            background: #06d6a0;
+            width: 100%;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+            }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+            .btn-success:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(6, 214, 160, 0.3);
+            }
+
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+            .terms-check input {
+                margin-top: 0.25rem;
+            }
+
+            .terms-check label {
+                font-size: 0.9rem;
+                color: #666;
+                line-height: 1.5;
+            }
+
+            .terms-check a {
+                color: var(--primary-color);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .brand-section {
+            margin-bottom: 3rem;
+        }
+
+        .brand-logo {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .benefits-list {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+            .benefit-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .benefit-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* Animations */
+        @@keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+
+        @@keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .signup-wrapper {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .signup-left {
+                text-align: center;
+            }
+
+            .brand-title {
+                font-size: 2rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signup-card {
+                padding: 2rem;
+            }
+
+            .progress-steps {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+                .progress-steps::before {
+                    display: none;
+                }
+        }
+
+        @@media (max-width: 576px) {
+            .signup-container {
+                padding: 1rem;
+            }
+
+            .form-footer {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-bg">
+        <div class="bg-gradient-animated gradient-1"></div>
+        <div class="bg-gradient-animated gradient-2"></div>
+        <div class="bg-gradient-animated gradient-3"></div>
+    </div>
+
+    <div class="signup-container">
+        <div class="signup-wrapper">
+            <div class="signup-left">
+                <div class="brand-section">
+                    <div class="brand-logo">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <h1 class="brand-title">Rejoignez SmartTaskFlow</h1>
+                    <p class="brand-subtitle">
+                        Commencez votre voyage vers une productivité exceptionnelle.
+                        Notre système intelligent s'adapte à votre rythme et vos besoins.
+                    </p>
+                </div>
+
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-rocket-takeoff"></i>
+                        </div>
+                        <div>
+                            <h4>Démarrage instantané</h4>
+                            <p>Configurez votre compte en 2 minutes</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h4>Sécurité garantie</h4>
+                            <p>Vos données sont chiffrées et protégées</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-infinity"></i>
+                        </div>
+                        <div>
+                            <h4>Gratuit à vie</h4>
+                            <p>Fonctionnalités essentielles toujours gratuites</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div>
+                            <h4>Communauté active</h4>
+                            <p>Rejoignez 10,000+ utilisateurs productifs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signup-card">
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Compte</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Profil</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Confirmation</div>
+                    </div>
+                </div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form method="post" asp-action="Signup" id="signupForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Step 1: Account Information -->
+                    <div class="form-section active" id="step1">
+                        <div class="form-header">
+                            <h3>Informations du compte</h3>
+                            <p>Créez vos identifiants d'accès</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-person-badge"></i>
+                                    Nom complet
+                                </label>
+                                <input type="text" name="fullName" class="form-control"
+                                       placeholder="Jean Dupont" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-person-circle"></i>
+                                    Nom d'utilisateur
+                                </label>
+                                <input type="text" name="username" class="form-control"
+                                       placeholder="jean.dupont" required />
+                                <small class="text-muted d-block mt-1">Utilisé pour vous connecter</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Adresse email
+                            </label>
+                            <input type="email" name="email" class="form-control"
+                                   placeholder="votre@email.com" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-key-fill"></i>
+                                Mot de passe
+                            </label>
+                            <input type="password" name="password" id="password" class="form-control"
+                                   placeholder="Minimum 8 caractères" required minlength="8" />
+                            <div class="password-strength">
+                                <div class="strength-meter" id="passwordStrength"></div>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                <i class="bi bi-info-circle"></i> Inclure majuscules, minuscules et chiffres
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-key"></i>
+                                Confirmer le mot de passe
+                            </label>
+                            <input type="password" name="confirmPassword" id="confirmPassword"
+                                   class="form-control" placeholder="Retapez votre mot de passe" required />
+                            <small class="text-danger" id="passwordMatchError" style="display: none;">
+                                <i class="bi bi-exclamation-circle"></i> Les mots de passe ne correspondent pas
+                            </small>
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="button" class="btn btn-secondary" id="prevBtn" disabled>
+                                <i class="bi bi-arrow-left"></i> Précédent
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextBtn1">
+                                Suivant <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Profile Information -->
+                    <div class="form-section" id="step2">
+                        <div class="form-header">
+                            <h3>Votre profil</h3>
+                            <p>Personnalisez votre expérience</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-briefcase"></i>
+                                Profession
+                            </label>
+                            <select name="profession" class="form-control">
+                                <option value="">Sélectionnez votre profession</option>
+                                <option value="etudiant">Étudiant</option>
+                                <option value="developpeur">Développeur</option>
+                                <option value="manager">Manager</option>
+                                <option value="designer">Designer</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-clock"></i>
+                                Rythme de travail préféré
+                            </label>
+                            <select name="workRhythm" class="form-control">
+                                <option value="">Quand êtes-vous le plus productif ?</option>
+                                <option value="matin">Matin (6h-12h)</option>
+                                <option value="aprem">Après-midi (12h-18h)</option>
+                                <option value="soir">Soir (18h-23h)</option>
+                                <option value="nuit">Nuit (23h-6h)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-bullseye"></i>
+                                Objectif principal
+                            </label>
+                            <select name="goal" class="form-control">
+                                <option value="">Que souhaitez-vous accomplir ?</option>
+                                <option value="productivity">Augmenter ma productivité</option>
+                                <option value="organization">Mieux m'organiser</option>
+                                <option value="stress">Réduire mon stress</option>
+                                <option value="projects">Gérer mes projets</option>
+                                <option value="team">Travailler en équipe</option>
+                            </select>
+                        </div>
+
+                        <div class="terms-check">
+                            <input type="checkbox" id="terms" name="terms" required />
+                            <label for="terms">
+                                J'accepte les <a href="#">conditions d'utilisation</a> et la
+                                <a href="#">politique de confidentialité</a>. Je comprends que
+                                SmartTaskFlow utilise mes données pour améliorer mes suggestions.
+                            </label>
+                        </div>
+
+                        <div class="terms-check">
+                            <input type="checkbox" id="newsletter" name="newsletter" />
+                            <label for="newsletter">
+                                Je souhaite recevoir des conseils de productivité et des
+                                nouveautés par email.
+                            </label>
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="button" class="btn btn-secondary" id="prevBtn2">
+                                <i class="bi bi-arrow-left"></i> Précédent
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextBtn2">
+                                Suivant <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Confirmation -->
+                    <div class="form-section" id="step3">
+                        <div class="form-header">
+                            <h3>Presque terminé !</h3>
+                            <p>Vérifiez vos informations avant de créer votre compte</p>
+                        </div>
+
+                        <div class="confirmation-summary">
+                            <div class="summary-item mb-3">
+                                <label class="text-muted small d-block">Nom complet</label>
+                                <div id="summaryFullName" class="fw-semibold">-</div>
+                            </div>
+
+                            <div class="summary-item mb-3">
+                                <label class="text-muted small d-block">Nom d'utilisateur</label>
+                                <div id="summaryUsername" class="fw-semibold">-</div>
+                            </div>
+
+                            <div class="summary-item mb-3">
+                                <label class="text-muted small d-block">Email</label>
+                                <div id="summaryEmail" class="fw-semibold">-</div>
+                            </div>
+
+                            <div class="summary-item mb-4">
+                                <label class="text-muted small d-block">Objectif</label>
+                                <div id="summaryGoal" class="fw-semibold">-</div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Un email de confirmation vous sera envoyé pour activer votre compte.
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="button" class="btn btn-secondary" id="prevBtn3">
+                                <i class="bi bi-arrow-left"></i> Précédent
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="bi bi-check-circle"></i> Créer mon compte
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="mb-2">Vous avez déjà un compte ?</p>
+                    <a asp-action="Login" class="fw-semibold text-decoration-none">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            const steps = document.querySelectorAll('.step');
+            const formSections = document.querySelectorAll('.form-section');
+
+            // Initialize steps
+            updateSteps();
+
+            // Step navigation
+            document.getElementById('nextBtn1').addEventListener('click', function() {
+                if (validateStep1()) {
+                    currentStep = 2;
+                    updateSteps();
+                    updateSummary();
+                }
+            });
+
+            document.getElementById('nextBtn2').addEventListener('click', function() {
+                if (validateStep2()) {
+                    currentStep = 3;
+                    updateSteps();
+                }
+            });
+
+            document.getElementById('prevBtn2').addEventListener('click', function() {
+                currentStep = 1;
+                updateSteps();
+            });
+
+            document.getElementById('prevBtn3').addEventListener('click', function() {
+                currentStep = 2;
+                updateSteps();
+            });
+
+            function updateSteps() {
+                // Update step indicators
+                steps.forEach(step => {
+                    const stepNum = parseInt(step.dataset.step);
+                    if (stepNum === currentStep) {
+                        step.classList.add('active');
+                    } else if (stepNum < currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+
+                // Show current form section
+                formSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`step${currentStep}`).classList.add('active');
+
+                // Update button states
+                document.getElementById('prevBtn').disabled = currentStep === 1;
+            }
+
+            function validateStep1() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const passwordMatchError = document.getElementById('passwordMatchError');
+
+                // Check password match
+                if (password !== confirmPassword) {
+                    passwordMatchError.style.display = 'block';
+                    document.getElementById('confirmPassword').focus();
+                    return false;
+                } else {
+                    passwordMatchError.style.display = 'none';
+                }
+
+                // Check password strength
+                if (password.length < 8) {
+                    alert('Le mot de passe doit contenir au moins 8 caractères');
+                    return false;
+                }
+
+                return true;
+            }
+
+            function validateStep2() {
+                const terms = document.getElementById('terms');
+                if (!terms.checked) {
+                    alert('Veuillez accepter les conditions d\'utilisation');
+                    terms.focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function updateSummary() {
+                document.getElementById('summaryFullName').textContent =
+                    document.querySelector('input[name="fullName"]').value;
+                document.getElementById('summaryUsername').textContent =
+                    document.querySelector('input[name="username"]').value;
+                document.getElementById('summaryEmail').textContent =
+                    document.querySelector('input[name="email"]').value;
+
+                const goalSelect = document.querySelector('select[name="goal"]');
+                const goalText = goalSelect.options[goalSelect.selectedIndex].text;
+                document.getElementById('summaryGoal').textContent =
+                    goalText || 'Non spécifié';
+            }
+
+            // Password strength meter
+            const passwordInput = document.getElementById('password');
+            const strengthMeter = document.getElementById('passwordStrength');
+
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+
+                // Length check
+                if (password.length >= 8) strength++;
+                if (password.length >= 12) strength++;
+
+                // Complexity checks
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+                // Update meter
+                strengthMeter.className = 'strength-meter';
+                if (strength >= 4) {
+                    strengthMeter.classList.add('strength-strong');
+                } else if (strength >= 2) {
+                    strengthMeter.classList.add('strength-medium');
+                } else if (password.length > 0) {
+                    strengthMeter.classList.add('strength-weak');
+                }
+            });
+
+            // Form submission
+            const form = document.getElementById('signupForm');
+            form.addEventListener('submit', function(e) {
+                if (!validateStep1() || !validateStep2()) {
+                    e.preventDefault();
+                    currentStep = 1;
+                    updateSteps();
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Création en cours...';
+                submitBtn.disabled = true;
+            });
+
+            // Real-time password match check
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('password').value;
+                const confirm = this.value;
+                const error = document.getElementById('passwordMatchError');
+
+                if (confirm && password !== confirm) {
+                    error.style.display = 'block';
+                } else {
+                    error.style.display = 'none';
+                }
+            });
+
+            // Add floating animation to gradient elements
+            const gradients = document.querySelectorAll('.bg-gradient-animated');
+            gradients.forEach((gradient, index) => {
+                gradient.style.animationDelay = `${index * 2}s`;
+            });
+        });
+    </script>
+</body>
+</html>

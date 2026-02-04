@@ -1,0 +1,132 @@
+﻿@model SmartTaskFlow.Models.User
+
+@{
+    ViewData["Title"] = "Supprimer l'utilisateur";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i> Supprimer l'utilisateur
+        </h2>
+        <a asp-action="Users" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Annuler
+        </a>
+    </div>
+
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmation de suppression</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger" role="alert">
+                <h5 class="alert-heading">
+                    <i class="bi bi-exclamation-octagon-fill"></i> ATTENTION !
+                </h5>
+                <p>Vous êtes sur le point de supprimer définitivement cet utilisateur.</p>
+                <hr>
+                <p class="mb-0">
+                    <strong>Cette action est IRRÉVERSIBLE</strong> et supprimera :
+                </p>
+                <ul class="mt-2">
+                    <li>Le compte utilisateur</li>
+                    <li>Toutes ses tâches (@Model.Tasks.Count)</li>
+                    <li>Son historique d'activité</li>
+                </ul>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Informations de l'utilisateur</h5>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 40%;">Nom d'utilisateur</th>
+                                <td>@Model.Username</td>
+                            </tr>
+                            <tr>
+                                <th>Nom complet</th>
+                                <td>@Model.FullName</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>@Model.Email</td>
+                            </tr>
+                            <tr>
+                                <th>Rôle</th>
+                                <td>
+                                    @if (Model.Role == "Admin")
+                                    {
+                                        <span class="badge bg-danger">Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">User</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Inscrit le</th>
+                                <td>@Model.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 class="mb-3">Données à supprimer</h5>
+                    <div class="card mb-3 border-warning">
+                        <div class="card-body text-center">
+                            <h2 class="text-warning mb-0">@Model.Tasks.Count</h2>
+                            <small class="text-muted">Tâches seront supprimées</small>
+                        </div>
+                    </div>
+
+                    @if (Model.Tasks.Any())
+                    {
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <strong>Liste des tâches</strong>
+                            </div>
+                            <div class="card-body p-2" style="max-height: 200px; overflow-y: auto;">
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var task in Model.Tasks.OrderByDescending(t => t.CreatedAt))
+                                    {
+                                        <li class="list-group-item py-1 px-2">
+                                            <small>
+                                                <i class="bi bi-circle-fill text-primary" style="font-size: 6px;"></i>
+                                                @task.Title
+                                                @if (task.Status == "Completed")
+                                                {
+                                                    <span class="badge bg-success">✓</span>
+                                                }
+                                            </small>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a asp-action="Users" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Non, annuler
+                </a>
+
+                <form asp-action="DeleteUser" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.UserId" />
+                    <button type="submit"
+                            class="btn btn-danger btn-lg"
+                            onclick="return confirm('⚠️ DERNIÈRE CONFIRMATION ⚠️\n\nÊtes-vous ABSOLUMENT SÛR de vouloir supprimer cet utilisateur et TOUTES ses données ?\n\nCette action est DÉFINITIVE et IRRÉVERSIBLE !');">
+                        <i class="bi bi-trash-fill"></i> Oui, supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

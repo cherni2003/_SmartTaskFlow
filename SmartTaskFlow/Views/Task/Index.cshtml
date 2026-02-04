@@ -1,0 +1,505 @@
+﻿@model IEnumerable<SmartTaskFlow.Models.TaskItem>
+
+
+
+<div class="container mt-4">
+    <!-- En-tête avec statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-check-circle-fill me-2"></i>Mes Tâches
+            </h1>
+            <p class="text-muted">Gérez toutes vos tâches en un seul endroit</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="d-flex flex-wrap justify-content-end gap-2">
+                <a asp-action="Dashboard" class="btn btn-outline-info d-flex align-items-center">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+                <a asp-action="Create" class="btn btn-success d-flex align-items-center">
+                    <i class="bi bi-plus-circle me-2"></i>Nouvelle tâche
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>@TempData["ErrorMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Barre de contrôle -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-primary active filter-btn" data-filter="all">
+                            <i class="bi bi-grid-3x3-gap me-1"></i>Toutes
+                        </button>
+                        <button type="button" class="btn btn-outline-warning filter-btn" data-filter="ToDo">
+                            <i class="bi bi-clock me-1"></i>À faire
+                        </button>
+                        <button type="button" class="btn btn-outline-info filter-btn" data-filter="InProgress">
+                            <i class="bi bi-play-circle me-1"></i>En cours
+                        </button>
+                        <button type="button" class="btn btn-outline-success filter-btn" data-filter="Completed">
+                            <i class="bi bi-check-circle me-1"></i>Terminées
+                        </button>
+                        <button type="button" class="btn btn-outline-danger filter-btn" data-filter="overdue">
+                            <i class="bi bi-exclamation-triangle me-1"></i>En retard
+                        </button>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-funnel me-1"></i>Priorité
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="all">Toutes</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="5">Urgent (5)</a></li>
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="4">Élevée (4)</a></li>
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="3">Moyenne (3)</a></li>
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="2">Faible (2)</a></li>
+                                <li><a class="dropdown-item priority-filter" href="#" data-priority="1">Très faible (1)</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-sort-down me-1"></i>Trier par
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item sort-option" href="#" data-sort="deadline">Date d'échéance</a></li>
+                                <li><a class="dropdown-item sort-option" href="#" data-sort="priority">Priorité (desc)</a></li>
+                                <li><a class="dropdown-item sort-option" href="#" data-sort="duration">Durée</a></li>
+                                <li><a class="dropdown-item sort-option" href="#" data-sort="created">Date de création</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une tâche...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    @{
+        var totalTasks = Model.Count();
+        var todoTasks = Model.Count(t => t.Status == "ToDo");
+        var inProgressTasks = Model.Count(t => t.Status == "InProgress");
+        var completedTasks = Model.Count(t => t.Status == "Completed");
+        var overdueTasks = Model.Count(t => t.IsOverdue);
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary bg-opacity-10 border-primary">
+                <div class="card-body py-3">
+                    <h6 class="card-subtitle mb-1 text-muted">Total</h6>
+                    <h3 class="card-title text-primary">@totalTasks</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning bg-opacity-10 border-warning">
+                <div class="card-body py-3">
+                    <h6 class="card-subtitle mb-1 text-muted">À faire</h6>
+                    <h3 class="card-title text-warning">@todoTasks</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger bg-opacity-10 border-danger">
+                <div class="card-body py-3">
+                    <h6 class="card-subtitle mb-1 text-muted">En retard</h6>
+                    <h3 class="card-title text-danger">@overdueTasks</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success bg-opacity-10 border-success">
+                <div class="card-body py-3">
+                    <h6 class="card-subtitle mb-1 text-muted">Terminées</h6>
+                    <h3 class="card-title text-success">@completedTasks</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="bi bi-clipboard-check display-1 text-muted mb-4"></i>
+                <h3 class="mb-3">Aucune tâche trouvée</h3>
+                <p class="text-muted mb-4">Commencez par créer votre première tâche !</p>
+                <a asp-action="Create" class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Créer ma première tâche
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row" id="tasksContainer">
+            @foreach (var task in Model)
+            {
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4 task-card"
+                     data-status="@task.Status"
+                     data-overdue="@task.IsOverdue.ToString().ToLower()"
+                     data-priority="@task.Priority"
+                     data-duration="@task.EstimatedDuration"
+                     data-deadline="@task.Deadline?.ToString("yyyy-MM-dd HH:mm")"
+                     data-created="@task.CreatedAt.ToString("yyyy-MM-dd HH:mm")"
+                     data-title="@task.Title.ToLower()"
+                     data-description="@(task.Description?.ToLower() ?? "")">
+
+                    <div class="card task-card-item h-100 shadow-sm hover-shadow transition-all">
+                        <div class="card-header d-flex justify-content-between align-items-center"
+                             style="background: linear-gradient(135deg, @(task.Category?.ColorCode ?? "#6c757d") 0%, @(task.Category?.ColorCode ?? "#6c757d")aa 100%);">
+                            <div class="d-flex align-items-center">
+                                <span class="text-white me-2">@(task.Category?.Icon ?? "📌")</span>
+                                <h5 class="card-title text-white mb-0 truncate">@task.Title</h5>
+                            </div>
+                            @{
+                                var priorityClass = task.Priority switch
+                                {
+                                    5 => "bg-danger",
+                                    4 => "bg-warning",
+                                    3 => "bg-info",
+                                    2 => "bg-success",
+                                    1 => "bg-secondary",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @priorityClass">
+                                @task.Priority
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-text text-muted mb-3">
+                                @if (string.IsNullOrEmpty(task.Description))
+                                {
+                                    <span class="fst-italic">Aucune description</span>
+                                }
+                                else
+                                {
+                                    @task.Description
+                                }
+                            </p>
+
+                            <div class="mb-3">
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-clock me-1"></i>@task.FormattedDuration
+                                    </span>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-lightning-charge me-1"></i>@task.EnergyLevelFrench
+                                    </span>
+                                    @{
+                                        var statusClass = task.Status switch
+                                        {
+                                            "Completed" => "bg-success",
+                                            "InProgress" => "bg-primary",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass">
+                                        @task.StatusFrench
+                                    </span>
+                                </div>
+
+                                @if (task.Deadline.HasValue)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mt-3 p-2 rounded @(task.IsOverdue ? "bg-danger bg-opacity-10" : "bg-light")">
+                                        <div>
+                                            <i class="bi bi-calendar-event @(task.IsOverdue ? "text-danger" : "text-muted") me-2"></i>
+                                            <span class="@(task.IsOverdue ? "text-danger fw-bold" : "text-dark")">
+                                                @task.Deadline.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        </div>
+                                        @if (task.IsOverdue)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-exclamation-triangle me-1"></i>RETARD
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Badge de priorité textuel -->
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-flag me-1"></i>
+                                    @task.PriorityBadge.Replace("🔴", "").Replace("🟠", "").Replace("🟡", "").Replace("🟢", "").Replace("⚪", "")
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0">
+                            <div class="d-flex justify-content-between">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@task.TaskId"
+                                       class="btn btn-sm btn-outline-info"
+                                       data-bs-toggle="tooltip"
+                                       title="Voir les détails">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@task.TaskId"
+                                       class="btn btn-sm btn-outline-warning"
+                                       data-bs-toggle="tooltip"
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    @if (task.Status != "Completed")
+                                    {
+                                        <form asp-controller="Task" asp-action="CompleteTask" asp-route-id="@task.TaskId"
+                                              method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success"
+                                                    data-bs-toggle="tooltip"
+                                                    title="Marquer comme terminée">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <a asp-action="Delete" asp-route-id="@task.TaskId"
+                                       class="btn btn-sm btn-outline-danger"
+                                       data-bs-toggle="tooltip"
+                                       title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+
+                                <small class="text-muted align-self-center">
+                                    <i class="bi bi-calendar-plus me-1"></i>
+                                    @task.CreatedAt.ToString("dd/MM/yy")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Initialiser les tooltips Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Filtrage par statut
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.dataset.filter;
+                    filterTasks(filter);
+                });
+            });
+
+            // Filtrage par priorité
+            document.querySelectorAll('.priority-filter').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const priority = this.dataset.priority;
+                    filterByPriority(priority);
+                });
+            });
+
+            // Tri des tâches
+            document.querySelectorAll('.sort-option').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sortBy = this.dataset.sort;
+                    sortTasks(sortBy);
+                });
+            });
+
+            // Recherche en temps réel
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                searchTasks(this.value.toLowerCase());
+            });
+        });
+
+        function filterTasks(status) {
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach(card => {
+                let show = false;
+
+                if (status === 'all') {
+                    show = true;
+                } else if (status === 'overdue') {
+                    show = card.dataset.overdue === 'true';
+                } else {
+                    show = card.dataset.status === status;
+                }
+
+                card.style.display = show ? 'block' : 'none';
+                card.parentElement.style.display = show ? 'block' : 'none';
+            });
+
+            updateTaskCount();
+        }
+
+        function filterByPriority(priority) {
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach(card => {
+                const show = priority === 'all' || card.dataset.priority === priority;
+                card.style.display = show ? 'block' : 'none';
+                card.parentElement.style.display = show ? 'block' : 'none';
+            });
+
+            updateTaskCount();
+        }
+
+        function searchTasks(query) {
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach(card => {
+                const title = card.dataset.title || '';
+                const description = card.dataset.description || '';
+                const show = title.includes(query) || description.includes(query);
+                card.style.display = show ? 'block' : 'none';
+                card.parentElement.style.display = show ? 'block' : 'none';
+            });
+
+            updateTaskCount();
+        }
+
+        function sortTasks(sortBy) {
+            const container = document.getElementById('tasksContainer');
+            const cards = Array.from(container.querySelectorAll('.col-xl-4'));
+
+            cards.sort((a, b) => {
+                const cardA = a.querySelector('.task-card');
+                const cardB = b.querySelector('.task-card');
+
+                switch(sortBy) {
+                    case 'deadline':
+                        const dateA = cardA.dataset.deadline || '9999-12-31 23:59';
+                        const dateB = cardB.dataset.deadline || '9999-12-31 23:59';
+                        return new Date(dateA) - new Date(dateB);
+                    case 'priority':
+                        // Priorité descendante (5 > 1)
+                        return parseInt(cardB.dataset.priority || 0) - parseInt(cardA.dataset.priority || 0);
+                    case 'duration':
+                        return (parseInt(cardA.dataset.duration) || 0) - (parseInt(cardB.dataset.duration) || 0);
+                    case 'created':
+                        return new Date(cardB.dataset.created) - new Date(cardA.dataset.created);
+                    default:
+                        return 0;
+                }
+            });
+
+            cards.forEach(card => container.appendChild(card));
+        }
+
+        function updateTaskCount() {
+            const visibleCards = document.querySelectorAll('.task-card[style*="block"]').length;
+            const totalCards = document.querySelectorAll('.task-card').length;
+
+            // Mettre à jour un élément d'affichage du compte
+            const counterElement = document.getElementById('visibleTasksCounter');
+            if (counterElement) {
+                counterElement.textContent = `${visibleCards}/${totalCards} tâches`;
+            }
+        }
+    </script>
+}
+
+<style>
+    .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
+    }
+
+    .hover-shadow {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .hover-shadow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .task-card-item {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-footer {
+        padding: 0.75rem 1rem;
+    }
+
+    .filter-btn.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .d-flex.flex-wrap.gap-2 {
+            gap: 0.5rem !important;
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .truncate {
+            max-width: 150px;
+        }
+    }
+</style>
